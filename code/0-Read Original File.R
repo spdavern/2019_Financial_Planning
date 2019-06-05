@@ -1,4 +1,4 @@
-# Extract the giving data from the Excel file:
+# Extract the giving data from the Excel file that the original data was provide in:
 library("readxl")
 giving.data <- read_excel("./data/Giving Data.xlsx")
 
