@@ -16,7 +16,6 @@ if (nrow(bad.totals) != 0) {
     "Some 'total' observations don't equal the sum of 'paypal' and 'offering'!"
   )
   print(bad.totals)
-  cat("\n")
 } else {
   message("All weekly totals equal the sum of 'paypal' and 'offering'.")
 }

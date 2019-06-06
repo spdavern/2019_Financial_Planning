@@ -12,12 +12,11 @@ source("../code/0-Extract data from Excel.R")
 df  # This is the data frame resulting from the import.
 ```
 
-As a first validation I'll check that the weekly totals PayPal and offering amounts sum to the weekly total, reporting only those that don't:
+As a first validation I'll check that the weekly PayPal and offering amounts sum to the weekly total ($paypal_i+{offering}_i=total_i$), reporting only those that don't:
 
 ```{r validate totals}
 source("../code/1-Validate totals.R")
 ```
-
 Ok, so December 2015 and 2016 seem to have totals greater than accounted for by the PayPal and offering amounts.  That's perhaps explainable by other giving coming in another way.  However, the April 2017 discrepancy seems to be missing $500.  I'll need to look into that.
 
 
