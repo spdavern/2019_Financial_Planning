@@ -4,7 +4,7 @@ library("readxl")
 # Extract the giving data from the Excel file that the original data was provide in:
 giving.data <- read_excel("../data/Giving Data.xlsx")
 
-library("dplyr", quietly = TRUE)
+library("dplyr")
 # Extract a copy of selected columns of the original data to manipulate.
 df <- select(
   .data = giving.data,
