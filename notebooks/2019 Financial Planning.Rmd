@@ -7,6 +7,20 @@ output:
   html_document:
     df_print: paged
   html_notebook: default
+references:
+- id: davern2013
+  title: An Assessment of Requested Seed Core Support ofr Expansion Based on Analysis of Giving
+  author:
+  - family: Davern
+    given: Sean
+  container-title: Internal Report
+  URL: ''
+  DOI: 
+  type: article-journal
+  issued:
+    year: 2013
+    month: 8
+    day: 21
 ---
 
 # Import of Data
@@ -58,19 +72,22 @@ Enable modeling year as factor...
 # Make year a categorical variable so coefficients are easier to interpret.
 df$year <- as.factor(df$year)
 ```
-Save and print the resulting tibble:
-```{r echo=TRUE}
+Save the resulting tibble:
+```{r echo=TRUE, eval=FALSE}  
+# Code chunk eval=false so files don't get overwritten willy nilly.
 # Write it as a csv:
 write.csv(x = df,
           file = "../data/Cleaned and Transformed Giving Data.csv",
           row.names = FALSE)
-# Save it as an R object
+# Save it as an R object that can be loaded into a new R object.
 saveRDS(df, file = "../data/Cleaned and Transformed Giving Data.rds")
 ```
 
+# Replicating Previous Modeling
+The relatively simple model derived in 2013 [see @davern2013, pg. 11] and used in 2018 used this model:
+$$\text{Monthly Giving} = a_1+b_{year}+c_{month}$$
+where $a_1$ is an overall grand average of the monthly giving amount, $b_{year}$ is an adjustment for the given year and $c_{month}$ is an adjustment for the month.
 
 
 
-
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
-
+# References
