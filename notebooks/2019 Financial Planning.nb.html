@@ -1771,6 +1771,8 @@ $(document).ready(function () {
 
 
 <!-- rnb-text-begin -->
+<div id="import-of-data" class="section level1">
+<h1>Import of Data</h1>
 <p>The original data was provided by John Earling in a work book entitled ‘Weekly PayPay &amp; Tithes .xls’ workbook. The layout/format of that workbook was not conducive to easily loading into R [nor JMP originally] and so was transcribed into the workbook ‘Giving Data.xlsx’ and then read into R.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
@@ -1787,6 +1789,9 @@ df  # This is the data frame resulting from the import.</code></pre>
 <!-- rnb-frame-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
+</div>
+<div id="some-minor-data-validation" class="section level1">
+<h1>Some Minor Data Validation</h1>
 <p>As a first validation I’ll check that the weekly PayPal and offering amounts sum to the weekly totals <span class="math inline">\((paypal_i+{offering}_i\overset{?}=total_i)\)</span>, reporting only those that aren’t equal:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
@@ -1807,10 +1812,72 @@ Some 'total' observations don't equal the sum of 'paypal' and 'offering'!</code>
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>Ok, so December 2015 and 2016 seem to have totals greater than accounted for by the PayPal and offering amounts. That’s perhaps explainable by other end-of-year giving coming in another way. However, the April 2017 discrepancy seems to be missing $500. I’ll need to look into that.</p>
+</div>
+<div id="data-transformation" class="section level1">
+<h1>Data Transformation</h1>
+<p>Aggregating the monthly totals and preparing to model month values…</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBEYXRhIHRyYW5zZm9ybWF0aW9uOiBDYWxjdWxhdGUgbW9udGhseSBnaXZpbmcgdG90YWxzLlxuIyBNYWtlIE1vbnRoIGEgY2F0ZWdvcmljYWwgdmFyaWFibGUgd2l0aCBsZXZlbHMgaW4gdGhlIG9yZGVyIHRoYXRcbiMgbW9udGhzIG9jY3VyIGluIHRoZSB5ZWFyIG90aGVyd2lzZSBtb250aHMgYXJlIHNvcnRlZCBhbHBoYWJldGljYWxseS5cbmRmJG1vbnRoIDwtIGZhY3RvcihkZiRtb250aCwgbW9udGgubmFtZSlcbiMgQWdncmVnYXRlIHRoZSBtb250aGx5IFRvdGFscyBmcm9tIGdpdmluZy5kYXRhIGluIHN1bXMgZm9yIGVhY2ggbW9udGguXG5Nb250aFRvdGFscyA8LSBcbiAgYWdncmVnYXRlKGRmJHRvdGFsLCBieSA9IGxpc3QoZGYkbW9udGgsIGRmJHllYXIpLCBGVU4gPSBzdW0pXG4jIEV4Y2x1ZGUgdGhlIG1vbnRocyB0aGF0IGRvbid0IGhhdmUgdG90YWxzIHlldC5cbk1vbnRoVG90YWxzIDwtIE1vbnRoVG90YWxzW2NvbXBsZXRlLmNhc2VzKE1vbnRoVG90YWxzKSwgXVxuIyBFeHRyYWN0IG9ubHkgcm93cyBjb250YWluaW5nICdtb250aGx5LmdpdmluZy5mYW1pbGllcycgZGF0YS5cbmRmIDwtIGRmWyFpcy5uYShkZiRtb250aGx5LmdpdmluZy5mYW1pbGllcyksXVxuIyBOb3cgcmVwbGFjZSBUb3RhbHMgKHdoaWNoIHdlcmUgd2Vla2x5IHRvdGFscykgd2l0aCBjYWxjdWxhdGVkIGFnZ3JlZ2F0ZXNcbmRmJHRvdGFsIDwtIE1vbnRoVG90YWxzJHhcbiMgcGF5cGFsICYgb2ZmZXJpbmcgY29sdW1ucyBhcmUgbm93IG1pc2xlYWRpbmcgKG9ubHkgd2VlaydzIHZhbHVlKSBzbyByZW1vdmUgdGhlbS5cbmRmIDwtIHNlbGVjdChkZiwgLXBheXBhbCwgLW9mZmVyaW5nKSBcbmBgYCJ9 -->
+<pre class="r"><code># Data transformation: Calculate monthly giving totals.
+# Make Month a categorical variable with levels in the order that
+# months occur in the year otherwise months are sorted alphabetically.
+df$month &lt;- factor(df$month, month.name)
+# Aggregate the monthly Totals from giving.data in sums for each month.
+MonthTotals &lt;- 
+  aggregate(df$total, by = list(df$month, df$year), FUN = sum)
+# Exclude the months that don't have totals yet.
+MonthTotals &lt;- MonthTotals[complete.cases(MonthTotals), ]
+# Extract only rows containing 'monthly.giving.families' data.
+df &lt;- df[!is.na(df$monthly.giving.families),]
+# Now replace Totals (which were weekly totals) with calculated aggregates
+df$total &lt;- MonthTotals$x
+# paypal &amp; offering columns are now misleading (only week's value) so remove them.
+df &lt;- select(df, -paypal, -offering) </code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Adding the number of giving Sundays in the month and the average giving each week per month…</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc291cmNlKFwiLi4vY29kZS9OdW1PZkdpdmVuRGF5T2ZXZWVrSW5Nb250aC5SXCIpXG4jIENhbGN1bGF0ZSBhbmQgYWRkIHRoZSBjb2x1bW5zIFN1bmRheXNJbk1vbnRoIHdpdGggY2FsY3VsYXRlZCB2YWx1ZXNcbiMgYW5kIE1vbnRoc0dpdmluZ1BlcldlZWtcbmRmIDwtICBkZiAlPiVcbiAgbXV0YXRlKFN1bmRheXNJbk1vbnRoID1cbiAgICAgICAgICAgTnVtT2ZHaXZlbkRheU9mV2Vla0luTW9udGgoZGYkd2Vlay5lbmRpbmcsIFwiU3VuZGF5XCIpKSAlPiVcbiAgbXV0YXRlKE1vbnRoc0dpdmluZ1BlcldlZWsgPSB0b3RhbCAvIFN1bmRheXNJbk1vbnRoKVxuYGBgIn0= -->
+<pre class="r"><code>source(&quot;../code/NumOfGivenDayOfWeekInMonth.R&quot;)
+# Calculate and add the columns SundaysInMonth with calculated values
+# and MonthsGivingPerWeek
+df &lt;-  df %&gt;%
+  mutate(SundaysInMonth =
+           NumOfGivenDayOfWeekInMonth(df$week.ending, &quot;Sunday&quot;)) %&gt;%
+  mutate(MonthsGivingPerWeek = total / SundaysInMonth)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Enable modeling year as factor…</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBNYWtlIHllYXIgYSBjYXRlZ29yaWNhbCB2YXJpYWJsZSBzbyBjb2VmZmljaWVudHMgYXJlIGVhc2llciB0byBpbnRlcnByZXQuXG5kZiR5ZWFyIDwtIGFzLmZhY3RvcihkZiR5ZWFyKVxuYGBgIn0= -->
+<pre class="r"><code># Make year a categorical variable so coefficients are easier to interpret.
+df$year &lt;- as.factor(df$year)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Save and print the resulting tibble:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBXcml0ZSBpdCBhcyBhIGNzdjpcbndyaXRlLmNzdih4ID0gZGYsXG4gICAgICAgICAgZmlsZSA9IFwiLi4vZGF0YS9DbGVhbmVkIGFuZCBUcmFuc2Zvcm1lZCBHaXZpbmcgRGF0YS5jc3ZcIixcbiAgICAgICAgICByb3cubmFtZXMgPSBGQUxTRSlcbiMgU2F2ZSBpdCBhcyBhbiBSIG9iamVjdFxuc2F2ZVJEUyhkZiwgZmlsZSA9IFwiLi4vZGF0YS9DbGVhbmVkIGFuZCBUcmFuc2Zvcm1lZCBHaXZpbmcgRGF0YS5yZHNcIilcbmBgYCJ9 -->
+<pre class="r"><code># Write it as a csv:
+write.csv(x = df,
+          file = &quot;../data/Cleaned and Transformed Giving Data.csv&quot;,
+          row.names = FALSE)
+# Save it as an R object
+saveRDS(df, file = &quot;../data/Cleaned and Transformed Giving Data.rds&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
 <p>The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike <em>Knit</em>, <em>Preview</em> does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.</p>
 <!-- rnb-text-end -->
+</div>
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiMjAxOSBTZWVkIEZpbmFuY2lhbCBQbGFubmluZyIKYXV0aG9yOiAiU2VhbiBEYXZlcm4iCmRhdGU6ICJKdW5lIDUsIDIwMTkiCm91dHB1dDoKICBwZGZfZG9jdW1lbnQ6IGRlZmF1bHQKICBodG1sX2RvY3VtZW50OgogICAgZGZfcHJpbnQ6IHBhZ2VkCiAgaHRtbF9ub3RlYm9vazogZGVmYXVsdAotLS0KClRoZSBvcmlnaW5hbCBkYXRhIHdhcyBwcm92aWRlZCBieSBKb2huIEVhcmxpbmcgaW4gYSB3b3JrIGJvb2sgZW50aXRsZWQgJ1dlZWtseSBQYXlQYXkgJiBUaXRoZXMgLnhscycgd29ya2Jvb2suICBUaGUgbGF5b3V0L2Zvcm1hdCBvZiB0aGF0IHdvcmtib29rIHdhcyBub3QgY29uZHVjaXZlIHRvIGVhc2lseSBsb2FkaW5nIGludG8gUiBbbm9yIEpNUCBvcmlnaW5hbGx5XSBhbmQgc28gd2FzIHRyYW5zY3JpYmVkIGludG8gdGhlIHdvcmtib29rICdHaXZpbmcgRGF0YS54bHN4JyBhbmQgdGhlbiByZWFkIGludG8gUi4KCmBgYHtyIGV4dHJhY3QsIG1lc3NhZ2U9RkFMU0V9CnNvdXJjZSgiLi4vY29kZS8wLUV4dHJhY3QgZGF0YSBmcm9tIEV4Y2VsLlIiKQpkZiAgIyBUaGlzIGlzIHRoZSBkYXRhIGZyYW1lIHJlc3VsdGluZyBmcm9tIHRoZSBpbXBvcnQuCmBgYAoKQXMgYSBmaXJzdCB2YWxpZGF0aW9uIEknbGwgY2hlY2sgdGhhdCB0aGUgd2Vla2x5IFBheVBhbCBhbmQgb2ZmZXJpbmcgYW1vdW50cyBzdW0gdG8gdGhlIHdlZWtseSB0b3RhbHMgJChwYXlwYWxfaSt7b2ZmZXJpbmd9X2lcb3ZlcnNldHs/fT10b3RhbF9pKSQsIHJlcG9ydGluZyBvbmx5IHRob3NlIHRoYXQgYXJlbid0IGVxdWFsOgpgYGB7ciB2YWxpZGF0ZSB0b3RhbHN9CnNvdXJjZSgiLi4vY29kZS8xLVZhbGlkYXRlIHRvdGFscy5SIikKYGBgCk9rLCBzbyBEZWNlbWJlciAyMDE1IGFuZCAyMDE2IHNlZW0gdG8gaGF2ZSB0b3RhbHMgZ3JlYXRlciB0aGFuIGFjY291bnRlZCBmb3IgYnkgdGhlIFBheVBhbCBhbmQgb2ZmZXJpbmcgYW1vdW50cy4gIFRoYXQncyBwZXJoYXBzIGV4cGxhaW5hYmxlIGJ5IG90aGVyIGVuZC1vZi15ZWFyIGdpdmluZyBjb21pbmcgaW4gYW5vdGhlciB3YXkuICBIb3dldmVyLCB0aGUgQXByaWwgMjAxNyBkaXNjcmVwYW5jeSBzZWVtcyB0byBiZSBtaXNzaW5nICQ1MDAuICBJJ2xsIG5lZWQgdG8gbG9vayBpbnRvIHRoYXQuCgoKClRoZSBwcmV2aWV3IHNob3dzIHlvdSBhIHJlbmRlcmVkIEhUTUwgY29weSBvZiB0aGUgY29udGVudHMgb2YgdGhlIGVkaXRvci4gQ29uc2VxdWVudGx5LCB1bmxpa2UgKktuaXQqLCAqUHJldmlldyogZG9lcyBub3QgcnVuIGFueSBSIGNvZGUgY2h1bmtzLiBJbnN0ZWFkLCB0aGUgb3V0cHV0IG9mIHRoZSBjaHVuayB3aGVuIGl0IHdhcyBsYXN0IHJ1biBpbiB0aGUgZWRpdG9yIGlzIGRpc3BsYXllZC4KCg==</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiMjAxOSBTZWVkIEZpbmFuY2lhbCBQbGFubmluZyIKYXV0aG9yOiAiU2VhbiBEYXZlcm4iCmRhdGU6ICJKdW5lIDUsIDIwMTkiCm91dHB1dDoKICBwZGZfZG9jdW1lbnQ6IGRlZmF1bHQKICBodG1sX2RvY3VtZW50OgogICAgZGZfcHJpbnQ6IHBhZ2VkCiAgaHRtbF9ub3RlYm9vazogZGVmYXVsdAotLS0KCiMgSW1wb3J0IG9mIERhdGEKVGhlIG9yaWdpbmFsIGRhdGEgd2FzIHByb3ZpZGVkIGJ5IEpvaG4gRWFybGluZyBpbiBhIHdvcmsgYm9vayBlbnRpdGxlZCAnV2Vla2x5IFBheVBheSAmIFRpdGhlcyAueGxzJyB3b3JrYm9vay4gIFRoZSBsYXlvdXQvZm9ybWF0IG9mIHRoYXQgd29ya2Jvb2sgd2FzIG5vdCBjb25kdWNpdmUgdG8gZWFzaWx5IGxvYWRpbmcgaW50byBSIFtub3IgSk1QIG9yaWdpbmFsbHldIGFuZCBzbyB3YXMgdHJhbnNjcmliZWQgaW50byB0aGUgd29ya2Jvb2sgJ0dpdmluZyBEYXRhLnhsc3gnIGFuZCB0aGVuIHJlYWQgaW50byBSLgoKYGBge3IgZXh0cmFjdCwgbWVzc2FnZT1GQUxTRX0Kc291cmNlKCIuLi9jb2RlLzAtRXh0cmFjdCBkYXRhIGZyb20gRXhjZWwuUiIpCmRmICAjIFRoaXMgaXMgdGhlIGRhdGEgZnJhbWUgcmVzdWx0aW5nIGZyb20gdGhlIGltcG9ydC4KYGBgCiMgU29tZSBNaW5vciBEYXRhIFZhbGlkYXRpb24KQXMgYSBmaXJzdCB2YWxpZGF0aW9uIEknbGwgY2hlY2sgdGhhdCB0aGUgd2Vla2x5IFBheVBhbCBhbmQgb2ZmZXJpbmcgYW1vdW50cyBzdW0gdG8gdGhlIHdlZWtseSB0b3RhbHMgJChwYXlwYWxfaSt7b2ZmZXJpbmd9X2lcb3ZlcnNldHs/fT10b3RhbF9pKSQsIHJlcG9ydGluZyBvbmx5IHRob3NlIHRoYXQgYXJlbid0IGVxdWFsOgpgYGB7ciB2YWxpZGF0ZSB0b3RhbHN9CnNvdXJjZSgiLi4vY29kZS8xLVZhbGlkYXRlIHRvdGFscy5SIikKYGBgCk9rLCBzbyBEZWNlbWJlciAyMDE1IGFuZCAyMDE2IHNlZW0gdG8gaGF2ZSB0b3RhbHMgZ3JlYXRlciB0aGFuIGFjY291bnRlZCBmb3IgYnkgdGhlIFBheVBhbCBhbmQgb2ZmZXJpbmcgYW1vdW50cy4gIFRoYXQncyBwZXJoYXBzIGV4cGxhaW5hYmxlIGJ5IG90aGVyIGVuZC1vZi15ZWFyIGdpdmluZyBjb21pbmcgaW4gYW5vdGhlciB3YXkuICBIb3dldmVyLCB0aGUgQXByaWwgMjAxNyBkaXNjcmVwYW5jeSBzZWVtcyB0byBiZSBtaXNzaW5nICQ1MDAuICBJJ2xsIG5lZWQgdG8gbG9vayBpbnRvIHRoYXQuCgojIERhdGEgVHJhbnNmb3JtYXRpb24KCkFnZ3JlZ2F0aW5nIHRoZSBtb250aGx5IHRvdGFscyBhbmQgcHJlcGFyaW5nIHRvIG1vZGVsIG1vbnRoIHZhbHVlcy4uLgpgYGB7cn0KIyBEYXRhIHRyYW5zZm9ybWF0aW9uOiBDYWxjdWxhdGUgbW9udGhseSBnaXZpbmcgdG90YWxzLgojIE1ha2UgTW9udGggYSBjYXRlZ29yaWNhbCB2YXJpYWJsZSB3aXRoIGxldmVscyBpbiB0aGUgb3JkZXIgdGhhdAojIG1vbnRocyBvY2N1ciBpbiB0aGUgeWVhciBvdGhlcndpc2UgbW9udGhzIGFyZSBzb3J0ZWQgYWxwaGFiZXRpY2FsbHkuCmRmJG1vbnRoIDwtIGZhY3RvcihkZiRtb250aCwgbW9udGgubmFtZSkKIyBBZ2dyZWdhdGUgdGhlIG1vbnRobHkgVG90YWxzIGZyb20gZ2l2aW5nLmRhdGEgaW4gc3VtcyBmb3IgZWFjaCBtb250aC4KTW9udGhUb3RhbHMgPC0gCiAgYWdncmVnYXRlKGRmJHRvdGFsLCBieSA9IGxpc3QoZGYkbW9udGgsIGRmJHllYXIpLCBGVU4gPSBzdW0pCiMgRXhjbHVkZSB0aGUgbW9udGhzIHRoYXQgZG9uJ3QgaGF2ZSB0b3RhbHMgeWV0LgpNb250aFRvdGFscyA8LSBNb250aFRvdGFsc1tjb21wbGV0ZS5jYXNlcyhNb250aFRvdGFscyksIF0KIyBFeHRyYWN0IG9ubHkgcm93cyBjb250YWluaW5nICdtb250aGx5LmdpdmluZy5mYW1pbGllcycgZGF0YS4KZGYgPC0gZGZbIWlzLm5hKGRmJG1vbnRobHkuZ2l2aW5nLmZhbWlsaWVzKSxdCiMgTm93IHJlcGxhY2UgVG90YWxzICh3aGljaCB3ZXJlIHdlZWtseSB0b3RhbHMpIHdpdGggY2FsY3VsYXRlZCBhZ2dyZWdhdGVzCmRmJHRvdGFsIDwtIE1vbnRoVG90YWxzJHgKIyBwYXlwYWwgJiBvZmZlcmluZyBjb2x1bW5zIGFyZSBub3cgbWlzbGVhZGluZyAob25seSB3ZWVrJ3MgdmFsdWUpIHNvIHJlbW92ZSB0aGVtLgpkZiA8LSBzZWxlY3QoZGYsIC1wYXlwYWwsIC1vZmZlcmluZykgCmBgYApBZGRpbmcgdGhlIG51bWJlciBvZiBnaXZpbmcgU3VuZGF5cyBpbiB0aGUgbW9udGggYW5kIHRoZSBhdmVyYWdlIGdpdmluZyBlYWNoIHdlZWsgcGVyIG1vbnRoLi4uCmBgYHtyfQpzb3VyY2UoIi4uL2NvZGUvTnVtT2ZHaXZlbkRheU9mV2Vla0luTW9udGguUiIpCiMgQ2FsY3VsYXRlIGFuZCBhZGQgdGhlIGNvbHVtbnMgU3VuZGF5c0luTW9udGggd2l0aCBjYWxjdWxhdGVkIHZhbHVlcwojIGFuZCBNb250aHNHaXZpbmdQZXJXZWVrCmRmIDwtICBkZiAlPiUKICBtdXRhdGUoU3VuZGF5c0luTW9udGggPQogICAgICAgICAgIE51bU9mR2l2ZW5EYXlPZldlZWtJbk1vbnRoKGRmJHdlZWsuZW5kaW5nLCAiU3VuZGF5IikpICU+JQogIG11dGF0ZShNb250aHNHaXZpbmdQZXJXZWVrID0gdG90YWwgLyBTdW5kYXlzSW5Nb250aCkKYGBgCkVuYWJsZSBtb2RlbGluZyB5ZWFyIGFzIGZhY3Rvci4uLgpgYGB7cn0KIyBNYWtlIHllYXIgYSBjYXRlZ29yaWNhbCB2YXJpYWJsZSBzbyBjb2VmZmljaWVudHMgYXJlIGVhc2llciB0byBpbnRlcnByZXQuCmRmJHllYXIgPC0gYXMuZmFjdG9yKGRmJHllYXIpCmBgYApTYXZlIGFuZCBwcmludCB0aGUgcmVzdWx0aW5nIHRpYmJsZToKYGBge3IgZWNobz1UUlVFfQojIFdyaXRlIGl0IGFzIGEgY3N2Ogp3cml0ZS5jc3YoeCA9IGRmLAogICAgICAgICAgZmlsZSA9ICIuLi9kYXRhL0NsZWFuZWQgYW5kIFRyYW5zZm9ybWVkIEdpdmluZyBEYXRhLmNzdiIsCiAgICAgICAgICByb3cubmFtZXMgPSBGQUxTRSkKIyBTYXZlIGl0IGFzIGFuIFIgb2JqZWN0CnNhdmVSRFMoZGYsIGZpbGUgPSAiLi4vZGF0YS9DbGVhbmVkIGFuZCBUcmFuc2Zvcm1lZCBHaXZpbmcgRGF0YS5yZHMiKQpgYGAKCgoKCgpUaGUgcHJldmlldyBzaG93cyB5b3UgYSByZW5kZXJlZCBIVE1MIGNvcHkgb2YgdGhlIGNvbnRlbnRzIG9mIHRoZSBlZGl0b3IuIENvbnNlcXVlbnRseSwgdW5saWtlICpLbml0KiwgKlByZXZpZXcqIGRvZXMgbm90IHJ1biBhbnkgUiBjb2RlIGNodW5rcy4gSW5zdGVhZCwgdGhlIG91dHB1dCBvZiB0aGUgY2h1bmsgd2hlbiBpdCB3YXMgbGFzdCBydW4gaW4gdGhlIGVkaXRvciBpcyBkaXNwbGF5ZWQuCgo=</div>
 
 
 

@@ -9,18 +9,66 @@ output:
   html_notebook: default
 ---
 
+# Import of Data
 The original data was provided by John Earling in a work book entitled 'Weekly PayPay & Tithes .xls' workbook.  The layout/format of that workbook was not conducive to easily loading into R [nor JMP originally] and so was transcribed into the workbook 'Giving Data.xlsx' and then read into R.
 
 ```{r extract, message=FALSE}
 source("../code/0-Extract data from Excel.R")
 df  # This is the data frame resulting from the import.
 ```
-
+# Some Minor Data Validation
 As a first validation I'll check that the weekly PayPal and offering amounts sum to the weekly totals $(paypal_i+{offering}_i\overset{?}=total_i)$, reporting only those that aren't equal:
 ```{r validate totals}
 source("../code/1-Validate totals.R")
 ```
 Ok, so December 2015 and 2016 seem to have totals greater than accounted for by the PayPal and offering amounts.  That's perhaps explainable by other end-of-year giving coming in another way.  However, the April 2017 discrepancy seems to be missing $500.  I'll need to look into that.
+
+# Data Transformation
+
+Aggregating the monthly totals and preparing to model month values...
+```{r}
+# Data transformation: Calculate monthly giving totals.
+# Make Month a categorical variable with levels in the order that
+# months occur in the year otherwise months are sorted alphabetically.
+df$month <- factor(df$month, month.name)
+# Aggregate the monthly Totals from giving.data in sums for each month.
+MonthTotals <- 
+  aggregate(df$total, by = list(df$month, df$year), FUN = sum)
+# Exclude the months that don't have totals yet.
+MonthTotals <- MonthTotals[complete.cases(MonthTotals), ]
+# Extract only rows containing 'monthly.giving.families' data.
+df <- df[!is.na(df$monthly.giving.families),]
+# Now replace Totals (which were weekly totals) with calculated aggregates
+df$total <- MonthTotals$x
+# paypal & offering columns are now misleading (only week's value) so remove them.
+df <- select(df, -paypal, -offering) 
+```
+Adding the number of giving Sundays in the month and the average giving each week per month...
+```{r}
+source("../code/NumOfGivenDayOfWeekInMonth.R")
+# Calculate and add the columns SundaysInMonth with calculated values
+# and MonthsGivingPerWeek
+df <-  df %>%
+  mutate(SundaysInMonth =
+           NumOfGivenDayOfWeekInMonth(df$week.ending, "Sunday")) %>%
+  mutate(MonthsGivingPerWeek = total / SundaysInMonth)
+```
+Enable modeling year as factor...
+```{r}
+# Make year a categorical variable so coefficients are easier to interpret.
+df$year <- as.factor(df$year)
+```
+Save and print the resulting tibble:
+```{r echo=TRUE}
+# Write it as a csv:
+write.csv(x = df,
+          file = "../data/Cleaned and Transformed Giving Data.csv",
+          row.names = FALSE)
+# Save it as an R object
+saveRDS(df, file = "../data/Cleaned and Transformed Giving Data.rds")
+```
+
+
 
 
 
