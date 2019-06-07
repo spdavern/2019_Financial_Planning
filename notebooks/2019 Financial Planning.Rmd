@@ -84,9 +84,53 @@ saveRDS(df, file = "../data/Cleaned and Transformed Giving Data.rds")
 ```
 
 # Replicating Previous Modeling
-The relatively simple model derived in 2013 [see @davern2013, pg. 11] and used in 2018 used this model:
+The relatively simple model derived in 2013 [see @davern2013, pg. 11] and used again in 2018 used this model:
 $$\text{Monthly Giving} = a_1+b_{year}+c_{month}$$
-where $a_1$ is an overall grand average of the monthly giving amount, $b_{year}$ is an adjustment for the given year and $c_{month}$ is an adjustment for the month.
+where $a_1$ is an overall grand average of the monthly giving amount, $b_{year}$ is an adjustment for the given year and $c_{month}$ is an adjustment for the month. The model was originally regressed on giving data from Jan 2010 through August 2013 excluding 3 high-fliers with known exceptional donations.
+We can now regress this model:
+```{r}
+# Pair the data down to that used in the original analysis
+df2 <- df[df$week.ending > "2010-01-01" & df$week.ending < "2013-07-31",] %>%
+  mutate(excluded = FALSE)
+df2$excluded[as.Date(df2$week.ending) == "2010-02-28"] <- TRUE
+df2$excluded[as.Date(df2$week.ending) == "2012-04-29"] <- TRUE
+df2$excluded[as.Date(df2$week.ending) == "2012-12-30"] <- TRUE
+# Regress the model
+mod <- lm(
+  formula = total ~
+    year + month,
+  data = df2[df2$excluded!=TRUE,]
+)
+```
+
+Showing the resulting predictions
+
+```{r}
+library("ggplot2")
+library(RColorBrewer)
+cbPalette <- brewer.pal(12,"Paired")  # Using http://colorbrewer2.org/
+names(cbPalette) <- levels(df2$month)
+colScale <- scale_color_manual(name = "month", values = cbPalette)
+df3 <- mutate(df2, predicted.values = predict(mod,df2)) %>%
+  mutate(residual.values = total - predicted.values )
+library("gridExtra")
+plot1 <- ggplot(df3, aes(x = week.ending, y = total, color=month )) + geom_point() +
+  geom_line(color='blue', data = df3, aes(x=week.ending, y=predicted.values)) +
+  colScale + labs(title = "Model Result")
+plot2 <- ggplot(df3, aes(x = predicted.values, y = total, color=month)) + 
+  geom_point() + geom_abline(intercept = 0, slope = 1, color="red") +
+  colScale + labs(x = "Monthly Giving Predicted", y = "Monthly Giving Actual",
+                  title = "Actual by Predicted Plot")
+plot3 <- ggplot(df3, aes(x = predicted.values, y = residual.values, color = month)) +
+  geom_point() + geom_hline(yintercept = 0, linetype="dashed", color = "blue") +
+  colScale + labs(x = "Monthly Giving Predicted", y = "Monthly Giving Residual",
+                  title = "Residual by Predicted Plot")
+plot4 <- ggplot(df3, aes(x = as.numeric(row.names(df3)), y = residual.values, 
+                color = month)) + 
+  geom_point() + geom_hline(yintercept = 0) + colScale +
+  labs(x = "Row Number", y = "Residual")
+grid.arrange(plot1,plot2, plot3, plot4, ncol=2, nrow=2)
+```
 
 
 
