@@ -3,9 +3,9 @@ title: "Transferring 2013 Analysis to R"
 author: "Sean Davern"
 date: "June 5, 2019"
 output:
-  html_notebook: default
   html_document:
     df_print: paged
+  html_notebook: default
   pdf_document: default
 references:
 - id: davern2013
@@ -86,6 +86,7 @@ write.csv(x = df,
 saveRDS(df, file = "../data/Cleaned and Transformed Giving Data.rds")
 ```
 
+\newpage
 # Replicating Previous Modeling
 The relatively simple model derived in 2013 [see @davern2013, pg. 11] and used again in 2018 used this model:
 $$\text{Monthly Giving} = a_1+b_{year}+c_{month}$$
@@ -137,6 +138,7 @@ ggplot(df3, aes(x = week.ending, y = total, color=month )) +
                      labels = scales::comma) +
   labs(x = "Date", y = "Month's Total Giving ($)")
 ```
+
 Note: excluded points [high fliers] are shown (above and below) though they weren't included in the regression.  Here are the fit diagnostics:
 
 ```{r echo=FALSE, message=FALSE}
