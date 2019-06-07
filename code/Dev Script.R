@@ -24,40 +24,39 @@ df <- select(
 )
 
 # Validate totals = paypal + offering
-bad.totals <- df[((df$paypal + df$offering) == df$total) == FALSE,]
-bad.totals <- bad.totals[!is.na(bad.totals$year),]
+library("magrittr")  # Provides piping functionality
+bad.totals <- df %>% select(-monthly.giving.families) %>%
+  mutate(calcd.total=paypal + offering) %>%
+  mutate(bad.total=!(calcd.total == total)) %>%
+  filter(!is.na(calcd.total)) %>%
+  filter(bad.total) %>%
+  select(-bad.total)
 if (nrow(bad.totals) != 0) {
-  bad.totals$calcd.total <- with(bad.totals, paypal + offering)
-  bad.totals$difference <- with(bad.totals, calcd.total - total)
-  bad.totals$monthly.giving.families <- NULL
   message("***** WARNING *****")
   message(
     "Some 'total' observations don't equal the sum of 'paypal' and 'offering'!"
   )
   print(bad.totals)
   cat("\n")
-  resp <- readline(prompt="Continue with totals as provided? If so, enter 'Y': ")
-  if (toupper(substr(trimws(resp),1,1)) != "Y") stop("Halting as instructed.")
-  cat("Continuing analysis with totals as provided.")
+} else {
+  message("All weekly totals equal the sum of 'paypal' and 'offering'.")
 }
 
 #  ***** Need to do something about these week totals.
 
-# Transform the data:
-# Calculate monthly giving totals.
+
+
+# Data transformation: Calculate monthly giving totals.
 # Make Month a categorical variable with levels in the order that
 # months occur in the year otherwise months are sorted alphabetically.
 df$month <- factor(df$month, month.name)
 # Aggregate the monthly Totals from giving.data in sums for each month.
-MonthTotals <-
+MonthTotals <- 
   aggregate(df$total, by = list(df$month, df$year), FUN = sum)
 # Exclude the months that don't have totals yet.
 MonthTotals <- MonthTotals[complete.cases(MonthTotals), ]
-
 # Extract only rows containing 'monthly.giving.families' data.
 df <- df[!is.na(df$monthly.giving.families),]
-#Another way to do this:
-#df <- filter(.data = df, !is.na(df$monthly.giving.families))
 # Now replace Totals (which were weekly totals) with calculated aggregates
 df$total <- MonthTotals$x
 
