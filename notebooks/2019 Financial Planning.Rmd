@@ -3,10 +3,10 @@ title: "2019 Seed Financial Planning"
 author: "Sean Davern"
 date: "June 5, 2019"
 output:
-  pdf_document: default
+  html_notebook: default
   html_document:
     df_print: paged
-  html_notebook: default
+  pdf_document: default
 references:
 - id: davern2013
   title: An Assessment of Requested Seed Core Support ofr Expansion Based on Analysis of Giving
@@ -14,7 +14,7 @@ references:
   - family: Davern
     given: Sean
   container-title: Internal Report
-  URL: ''
+  URL: "file://../Reports/'August 2013 Analysis of Giving.pdf'"
   DOI: 
   type: article-journal
   issued:
