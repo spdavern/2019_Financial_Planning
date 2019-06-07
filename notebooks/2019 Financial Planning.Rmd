@@ -14,7 +14,7 @@ references:
   - family: Davern
     given: Sean
   container-title: Internal Report
-  URL: "file://../Reports/'August 2013 Analysis of Giving.pdf'"
+  URL: "file://../Reports/August%202013%20Analysis%20of%20Giving.pdf"
   DOI: 
   type: article-journal
   issued:
@@ -120,11 +120,11 @@ plot1 <- ggplot(df3, aes(x = week.ending, y = total, color=month )) + geom_point
 plot2 <- ggplot(df3, aes(x = predicted.values, y = total, color=month)) + 
   geom_point() + geom_abline(intercept = 0, slope = 1, color="red") +
   colScale + labs(x = "Monthly Giving Predicted", y = "Monthly Giving Actual",
-                  title = "Actual by Predicted Plot")
+                  title = "Act. by Pred. Plot")
 plot3 <- ggplot(df3, aes(x = predicted.values, y = residual.values, color = month)) +
   geom_point() + geom_hline(yintercept = 0, linetype="dashed", color = "blue") +
   colScale + labs(x = "Monthly Giving Predicted", y = "Monthly Giving Residual",
-                  title = "Residual by Predicted Plot")
+                  title = "Resid. by Pred. Plot")
 plot4 <- ggplot(df3, aes(x = as.numeric(row.names(df3)), y = residual.values, 
                 color = month)) + 
   geom_point() + geom_hline(yintercept = 0) + colScale +
