@@ -3,10 +3,10 @@ title: "Transferring 2013 Analysis to R"
 author: "Sean Davern"
 date: "June 5, 2019"
 output:
-  pdf_document: default
+  html_notebook: default
   html_document:
     df_print: paged
-  html_notebook: default
+  pdf_document: default
 references:
 - id: davern2013
   title: An Assessment of Requested Seed Core Support for Expansion Based on Analysis of Giving
@@ -91,6 +91,7 @@ The relatively simple model derived in 2013 [see @davern2013, pg. 11] and used a
 $$\text{Monthly Giving} = a_1+b_{year}+c_{month}$$
 where $a_1$ is an overall grand average of the monthly giving amount, $b_{year}$ is an adjustment for the given year and $c_{month}$ is an adjustment for the month. The model was originally regressed on giving data from Jan 2010 through August 2013 excluding 3 high-fliers with known exceptional donations.
 We can now regress this model:
+
 ```{r}
 library("magrittr")
 # Pair the data down to that used in the original analysis
