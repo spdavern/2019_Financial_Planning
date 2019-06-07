@@ -95,7 +95,7 @@ df2 <- df[df$week.ending > "2010-01-01" & df$week.ending < "2013-07-31",] %>%
 df2$excluded[as.Date(df2$week.ending) == "2010-02-28"] <- TRUE
 df2$excluded[as.Date(df2$week.ending) == "2012-04-29"] <- TRUE
 df2$excluded[as.Date(df2$week.ending) == "2012-12-30"] <- TRUE
-# Regress the model
+# Regress the model cluding the indicated values:
 mod <- lm(
   formula = total ~
     year + month,
@@ -103,33 +103,52 @@ mod <- lm(
 )
 ```
 
-Showing the resulting predictions
+Which gives the resulting model fit:
 
-```{r}
+```{r echo= FALSE}
+library("dplyr")
 library("ggplot2")
 library(RColorBrewer)
-cbPalette <- brewer.pal(12,"Paired")  # Using http://colorbrewer2.org/
-names(cbPalette) <- levels(df2$month)
-colScale <- scale_color_manual(name = "month", values = cbPalette)
-df3 <- mutate(df2, predicted.values = predict(mod,df2)) %>%
-  mutate(residual.values = total - predicted.values )
 library("gridExtra")
-plot1 <- ggplot(df3, aes(x = week.ending, y = total, color=month )) + geom_point() +
-  geom_line(color='blue', data = df3, aes(x=week.ending, y=predicted.values)) +
-  colScale + labs(title = "Model Result")
+# library("cowplot")
+cbPalette <- brewer.pal(12,"Paired")  # Used http://colorbrewer2.org/
+names(cbPalette) <- levels(month.name)
+colScale <- scale_color_manual(name = "month", values = cbPalette)
+# For plots showing excluded points comment out this next line:
+df3 <- df2[df2$excluded!=TRUE,]
+df3 <- mutate(df3, predicted.values = predict(mod,df3)) %>%
+  mutate(residual.values = total - predicted.values )
+t.size <- 9
+plot1 <- ggplot(df3, aes(x = week.ending, y = total, color=month )) +
+  geom_point() + geom_line(color='blue', data = df3, 
+                           aes(x=week.ending,y=predicted.values)) +
+  colScale + labs(title = "Monthly Giving Model & Data") + 
+  theme(text = element_text(size=t.size))
 plot2 <- ggplot(df3, aes(x = predicted.values, y = total, color=month)) + 
   geom_point() + geom_abline(intercept = 0, slope = 1, color="red") +
   colScale + labs(x = "Monthly Giving Predicted", y = "Monthly Giving Actual",
-                  title = "Act. by Pred. Plot")
+                  title = "Act. by Pred. Plot") +
+  theme(text = element_text(size=t.size), 
+        axis.text.x = element_text(angle=45, hjust=1)) +
+  theme(legend.position="none")
 plot3 <- ggplot(df3, aes(x = predicted.values, y = residual.values, color = month)) +
-  geom_point() + geom_hline(yintercept = 0, linetype="dashed", color = "blue") +
-  colScale + labs(x = "Monthly Giving Predicted", y = "Monthly Giving Residual",
-                  title = "Resid. by Pred. Plot")
+  geom_point() + geom_hline(yintercept = 0, linetype="dashed", 
+                            color = "blue") +
+  colScale + labs(x = "Monthly Giving Predicted", y = "Residuals",
+                  title = "Resid. by Pred. Plot") + 
+  theme(text = element_text(size=t.size), 
+        axis.text.x = element_text(angle=45, hjust=1)) +
+  theme(legend.position="none")
 plot4 <- ggplot(df3, aes(x = as.numeric(row.names(df3)), y = residual.values, 
                 color = month)) + 
-  geom_point() + geom_hline(yintercept = 0) + colScale +
-  labs(x = "Row Number", y = "Residual")
-grid.arrange(plot1,plot2, plot3, plot4, ncol=2, nrow=2)
+  geom_point() + geom_hline(yintercept = 0, linetype="dashed", 
+                            color = "blue") + colScale +
+  labs(x = "Row Number", y = "Residuals",
+                  title = "Resid. by Row Plot") + theme(text = element_text(size=t.size)) +
+  theme(legend.position="none")
+plot1
+grid.arrange(plot2, plot3, plot4, ncol=2, nrow=2)
+# plot_grid(plot2, plot3, plot4, labels = "AUTO")
 ```
 
 
