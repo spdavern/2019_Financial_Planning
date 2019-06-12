@@ -1,0 +1,384 @@
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\hypersetup{unicode=true,
+            pdftitle={Transferring 2013 Analysis to R},
+            pdfauthor={Sean Davern},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+%%% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+%%% Change title format to be more compact
+\usepackage{titling}
+
+% Create subtitle command for use in maketitle
+\providecommand{\subtitle}[1]{
+  \posttitle{
+    \begin{center}\large#1\end{center}
+    }
+}
+
+\setlength{\droptitle}{-2em}
+
+  \title{Transferring 2013 Analysis to R}
+    \pretitle{\vspace{\droptitle}\centering\huge}
+  \posttitle{\par}
+    \author{Sean Davern}
+    \preauthor{\centering\large\emph}
+  \postauthor{\par}
+      \predate{\centering\large\emph}
+  \postdate{\par}
+    \date{June 5, 2019}
+
+
+\begin{document}
+\maketitle
+
+\hypertarget{objective-of-this-work}{%
+\section{Objective of this Work}\label{objective-of-this-work}}
+
+The objective of the work captured in this notebook is to translate part
+of an analysis done in 2013 (See Davern (2013)) into R to learn and
+demonstrate multiple R capabilities and workflows.
+
+\hypertarget{import-of-data}{%
+\section{Import of Data}\label{import-of-data}}
+
+The original data was provided by John Earling in a work book entitled
+`Weekly PayPay \& Tithes .xls' workbook. The layout/format of that
+workbook was not conducive to easily loading into R {[}nor JMP
+originally{]} and so was transcribed into the workbook `Giving
+Data.xlsx' and then read into R.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{source}\NormalTok{(}\StringTok{"../code/0-Extract data from Excel.R"}\NormalTok{)}
+\NormalTok{df  }\CommentTok{# This is the data frame resulting from the import.}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 469 x 7
+##    week.ending         month   year paypal offering  total monthly.giving.~
+##    <dttm>              <chr>  <dbl>  <dbl>    <dbl>  <dbl>            <dbl>
+##  1 2010-01-03 00:00:00 Janua~  2010     75    1560   1635                NA
+##  2 2010-01-10 00:00:00 Janua~  2010    575    3129   3704                NA
+##  3 2010-01-17 00:00:00 Janua~  2010    475    2025   2500                NA
+##  4 2010-01-24 00:00:00 Janua~  2010     75    1180.  1255.               NA
+##  5 2010-01-31 00:00:00 Janua~  2010   2180    2967.  5147.               45
+##  6 2010-02-07 00:00:00 Febru~  2010     75    4722.  4798.               NA
+##  7 2010-02-14 00:00:00 Febru~  2010    585    2925   3510                NA
+##  8 2010-02-21 00:00:00 Febru~  2010    200    3299   3499                NA
+##  9 2010-02-28 00:00:00 Febru~  2010   6350    4281  10631                41
+## 10 2010-03-07 00:00:00 March   2010    770    1170   1940                NA
+## # ... with 459 more rows
+\end{verbatim}
+
+\hypertarget{some-minor-data-validation}{%
+\section{Some Minor Data Validation}\label{some-minor-data-validation}}
+
+As a first validation I'll check that the weekly PayPal and offering
+amounts sum to the weekly totals
+\((paypal_i+{offering}_i\overset{?}=total_i)\), reporting only those
+that aren't equal:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{source}\NormalTok{(}\StringTok{"../code/1-Validate totals.R"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## ***** WARNING *****
+\end{verbatim}
+
+\begin{verbatim}
+## Some 'total' observations don't equal the sum of 'paypal' and 'offering'!
+\end{verbatim}
+
+\begin{verbatim}
+## # A tibble: 3 x 8
+##   week.ending         month    year paypal offering total calcd.total  diff
+##   <dttm>              <chr>   <dbl>  <dbl>    <dbl> <dbl>       <dbl> <dbl>
+## 1 2015-12-27 00:00:00 Decemb~  2015   1902     9306 16958       11208  5750
+## 2 2016-12-25 00:00:00 Decemb~  2016   4635    10089 22849       14724  8125
+## 3 2017-04-23 00:00:00 April    2017    635     4480  4615        5115  -500
+\end{verbatim}
+
+Ok, so December 2015 and 2016 seem to have totals greater than accounted
+for by the PayPal and offering amounts. That's perhaps explainable by
+other end-of-year giving coming in another way. However, the April 2017
+discrepancy seems to be missing \$500. I'll need to look into that.
+
+\hypertarget{data-transformation}{%
+\section{Data Transformation}\label{data-transformation}}
+
+Aggregating the monthly totals and preparing to model month
+values\ldots{}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Data transformation: Calculate monthly giving totals.}
+\CommentTok{# Make Month a categorical variable with levels in the order that}
+\CommentTok{# months occur in the year otherwise months are sorted alphabetically.}
+\NormalTok{df}\OperatorTok{$}\NormalTok{month <-}\StringTok{ }\KeywordTok{factor}\NormalTok{(df}\OperatorTok{$}\NormalTok{month, month.name)}
+\CommentTok{# Aggregate the monthly Totals from giving.data in sums for each month.}
+\NormalTok{MonthTotals <-}\StringTok{ }
+\StringTok{  }\KeywordTok{aggregate}\NormalTok{(df}\OperatorTok{$}\NormalTok{total, }\DataTypeTok{by =} \KeywordTok{list}\NormalTok{(df}\OperatorTok{$}\NormalTok{month, df}\OperatorTok{$}\NormalTok{year), }\DataTypeTok{FUN =}\NormalTok{ sum)}
+\CommentTok{# Exclude the months that don't have totals yet.}
+\NormalTok{MonthTotals <-}\StringTok{ }\NormalTok{MonthTotals[}\KeywordTok{complete.cases}\NormalTok{(MonthTotals), ]}
+\CommentTok{# Extract only rows containing 'monthly.giving.families' data.}
+\NormalTok{df <-}\StringTok{ }\NormalTok{df[}\OperatorTok{!}\KeywordTok{is.na}\NormalTok{(df}\OperatorTok{$}\NormalTok{monthly.giving.families),]}
+\CommentTok{# Now replace Totals (which were weekly totals) with calculated aggregates}
+\NormalTok{df}\OperatorTok{$}\NormalTok{total <-}\StringTok{ }\NormalTok{MonthTotals}\OperatorTok{$}\NormalTok{x}
+\CommentTok{# paypal & offering columns are now misleading (only week's value) so remove them.}
+\NormalTok{df <-}\StringTok{ }\KeywordTok{select}\NormalTok{(df, }\OperatorTok{-}\NormalTok{paypal, }\OperatorTok{-}\NormalTok{offering) }
+\end{Highlighting}
+\end{Shaded}
+
+Adding the number of giving Sundays in the month and the average giving
+each week per month\ldots{}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(}\StringTok{"magrittr"}\NormalTok{)}
+\KeywordTok{source}\NormalTok{(}\StringTok{"../code/NumOfGivenDayOfWeekInMonth.R"}\NormalTok{)}
+\CommentTok{# Calculate and add the columns SundaysInMonth with calculated values}
+\CommentTok{# and MonthsGivingPerWeek}
+\NormalTok{df <-}\StringTok{  }\NormalTok{df }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{SundaysInMonth =}
+           \KeywordTok{NumOfGivenDayOfWeekInMonth}\NormalTok{(df}\OperatorTok{$}\NormalTok{week.ending, }\StringTok{"Sunday"}\NormalTok{)) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{MonthsGivingPerWeek =}\NormalTok{ total }\OperatorTok{/}\StringTok{ }\NormalTok{SundaysInMonth)}
+\end{Highlighting}
+\end{Shaded}
+
+Enable modeling year as factor rather than a number\ldots{}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Make year a categorical variable so coefficients are easier to interpret.}
+\NormalTok{df}\OperatorTok{$}\NormalTok{year <-}\StringTok{ }\KeywordTok{as.factor}\NormalTok{(df}\OperatorTok{$}\NormalTok{year)}
+\end{Highlighting}
+\end{Shaded}
+
+Save the resulting R tibble:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Code chunk eval=false so files don't get overwritten willy nilly.}
+\CommentTok{# Write it as a csv:}
+\KeywordTok{write.csv}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ df,}
+          \DataTypeTok{file =} \StringTok{"../data/Cleaned and Transformed Giving Data.csv"}\NormalTok{,}
+          \DataTypeTok{row.names =} \OtherTok{FALSE}\NormalTok{)}
+\CommentTok{# Save it also as an R object that can be loaded into a new R object.}
+\KeywordTok{saveRDS}\NormalTok{(df, }\DataTypeTok{file =} \StringTok{"../data/Cleaned and Transformed Giving Data.rds"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\newpage
+
+\hypertarget{replicating-previous-modeling}{%
+\section{Replicating Previous
+Modeling}\label{replicating-previous-modeling}}
+
+The relatively simple model derived in 2013 (see Davern 2013, pg. 11)
+and used again in 2018 used this model:
+\[\text{Monthly Giving} = a_1+b_{year}+c_{month}\] where \(a_1\) is an
+overall grand average of the monthly giving amount, \(b_{year}\) is an
+adjustment for the given year and \(c_{month}\) is an adjustment for the
+month. The model was originally regressed on giving data from Jan 2010
+through August 2013 excluding 3 high-fliers with known exceptional
+donations. We can now regress this model:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(}\StringTok{"magrittr"}\NormalTok{)}
+\CommentTok{# Pair the data down to that used in the original analysis}
+\NormalTok{df2 <-}\StringTok{ }\NormalTok{df[}\KeywordTok{as.Date}\NormalTok{(df}\OperatorTok{$}\NormalTok{week.ending) }\OperatorTok{>}\StringTok{ "2010-01-01"} \OperatorTok{&}\StringTok{ }
+\StringTok{            }\KeywordTok{as.Date}\NormalTok{(df}\OperatorTok{$}\NormalTok{week.ending) }\OperatorTok{<}\StringTok{ "2013-08-31"}\NormalTok{,] }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{excluded =} \OtherTok{FALSE}\NormalTok{)}
+\NormalTok{df2}\OperatorTok{$}\NormalTok{excluded[}\KeywordTok{as.Date}\NormalTok{(df2}\OperatorTok{$}\NormalTok{week.ending) }\OperatorTok{==}\StringTok{ "2010-02-28"}\NormalTok{] <-}\StringTok{ }\OtherTok{TRUE}
+\NormalTok{df2}\OperatorTok{$}\NormalTok{excluded[}\KeywordTok{as.Date}\NormalTok{(df2}\OperatorTok{$}\NormalTok{week.ending) }\OperatorTok{==}\StringTok{ "2012-04-29"}\NormalTok{] <-}\StringTok{ }\OtherTok{TRUE}
+\NormalTok{df2}\OperatorTok{$}\NormalTok{excluded[}\KeywordTok{as.Date}\NormalTok{(df2}\OperatorTok{$}\NormalTok{week.ending) }\OperatorTok{==}\StringTok{ "2012-12-30"}\NormalTok{] <-}\StringTok{ }\OtherTok{TRUE}
+\CommentTok{# Regress the model cluding the indicated values:}
+\NormalTok{mod <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(}
+  \DataTypeTok{formula =}\NormalTok{ total }\OperatorTok{~}
+\StringTok{    }\NormalTok{year }\OperatorTok{+}\StringTok{ }\NormalTok{month,}
+  \DataTypeTok{data =}\NormalTok{ df2[df2}\OperatorTok{$}\NormalTok{excluded}\OperatorTok{!=}\OtherTok{TRUE}\NormalTok{,]}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Which gives the resulting model fit:
+
+\includegraphics{Transfer_of_2013_Analysis_files/figure-latex/unnamed-chunk-6-1.pdf}
+
+Note: excluded points {[}high fliers{]} are shown (above and below)
+though they weren't included in the regression. Here are the fit
+diagnostics:
+
+\begin{verbatim}
+## Analysis of Variance Table
+## 
+## Response: total
+##           Df    Sum Sq Mean Sq F value Pr(>F)
+## year       3  21431854 7143951  1.4506  0.251
+## month     11  93473089 8497554  1.7254  0.123
+## Residuals 26 128049780 4924992
+\end{verbatim}
+
+\includegraphics{Transfer_of_2013_Analysis_files/figure-latex/unnamed-chunk-7-1.pdf}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = total ~ year + month, data = df2[df2$excluded != 
+##     TRUE, ])
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -3262.7 -1266.4   269.4  1181.2  4604.5 
+## 
+## Coefficients:
+##                Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)    12539.40    1264.30   9.918 2.52e-10 ***
+## year2011         708.72     933.26   0.759   0.4544    
+## year2012        1531.73     997.47   1.536   0.1367    
+## year2013        2295.36    1082.20   2.121   0.0436 *  
+## monthFebruary   -210.59    1706.96  -0.123   0.9028    
+## monthMarch      2164.52    1569.23   1.379   0.1795    
+## monthApril       376.99    1707.70   0.221   0.8270    
+## monthMay         752.68    1569.23   0.480   0.6355    
+## monthJune       1195.27    1569.23   0.762   0.4531    
+## monthJuly       2886.33    1569.23   1.839   0.0773 .  
+## monthAugust      158.54    1569.23   0.101   0.9203    
+## monthSeptember    37.28    1710.48   0.022   0.9828    
+## monthOctober    4547.45    1710.48   2.659   0.0132 *  
+## monthNovember  -1306.57    1710.48  -0.764   0.4518    
+## monthDecember   2621.14    1956.39   1.340   0.1919    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 2219 on 26 degrees of freedom
+## Multiple R-squared:  0.4729, Adjusted R-squared:  0.1892 
+## F-statistic: 1.666 on 14 and 26 DF,  p-value: 0.1261
+\end{verbatim}
+
+The results obtained are different in a number of ways from what was
+obtained in 2013. The general fit (residuals) and shape of the predicted
+values are similar to that obtained in 2013 though the June predictions
+seem further away than the other months. The regressed coefficients are
+obviously very different, but this is largely due to the method JMP uses
+for regressing factor coefficients. However, the difference in the June
+predictions and slightly different factor p-values tells me that
+something in the underlying data is probably different. I'm not going to
+spend the time to diagnose the precise details of the difference since
+the objective is to translate the analysis to R rather than reproduce
+it.
+
+\hypertarget{references}{%
+\section*{References}\label{references}}
+\addcontentsline{toc}{section}{References}
+
+\hypertarget{refs}{}
+\leavevmode\hypertarget{ref-davern2013}{}%
+Davern, Sean. 2013. ``An Assessment of Requested Seed Core Support for
+Expansion Based on Analysis of Giving.'' \emph{Internal Report}, August.
+\url{file://../Reports/August\%202013\%20Analysis\%20of\%20Giving.pdf}.
+
+
+\end{document}
