@@ -5,8 +5,8 @@ date: "June 5, 2019"
 output:
   html_document:
     df_print: paged
-  html_notebook: default
   pdf_document: default
+  html_notebook: default
 references:
 - id: davern2013
   title: An Assessment of Requested Seed Core Support for Expansion Based on Analysis of Giving
@@ -145,6 +145,13 @@ Note: excluded points [high fliers] are shown (above and below) though they were
 library("gridExtra")
 # library("cowplot")
 anova(mod)
+plot1 <- ggplot(mod, aes(sample = mod$residuals)) +
+  stat_qq() + 
+  stat_qq_line(linetype="dashed", color="blue") +
+  labs(x = "Theoretical Quantiles",
+       y = "Standardized Residuals",
+       title = "Normal Q-Q Plot") +
+  theme(text = element_text(size=t.size))
 plot2 <- ggplot(df3, aes(x = predicted.values, y = total, color=month)) + 
   geom_point() + geom_abline(intercept = 0, slope = 1, color="red") +
   colScale + labs(x = "Monthly Giving Predicted", 
@@ -173,7 +180,7 @@ plot4 <- ggplot(df3, aes(x = as.numeric(row.names(df3)),
        title = "Resid. by Row Plot") + 
   theme(text = element_text(size=t.size)) +
   theme(legend.position="none")
-grid.arrange(plot2, plot3, plot4, ncol=2, nrow=2)
+grid.arrange(plot2, plot3, plot4, plot1, ncol=2, nrow=2)
 # plot_grid(plot2, plot3, plot4, labels = "AUTO")
 summary(mod)
 ```
