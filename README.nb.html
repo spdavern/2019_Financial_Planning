@@ -1777,13 +1777,16 @@ $(document).ready(function () {
 <ul>
 <li>Extend work done in 2013 and 2018 to model and forecast Seed giving data and create projections for 2018-2019 budgeting purposes.</li>
 <li>Previous work was done using JMP which is not accessible to those without that software, including me now. Transferring this work into R allows sharing with others and my own re-use.</li>
-<li>I’m using this exercise to document my own R/RStudio skills and to create examples.</li>
+<li>I’m using this exercise to document my own R/RStudio skills and to create examples. I am experimenting with a blend of <a href="https://en.wikipedia.org/wiki/Literate_programming">literate programming</a> and coding-like project organization suggested by pavopax.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></li>
 </ul>
+<p>This project uses <a href="https://git-scm.com/">git</a> for version control and <a href="https://rstudio.github.io/packrat/">packrat</a> for package dependency management.</p>
 </div>
 <div id="setup" class="section level1">
 <h1>Setup</h1>
-<p>Install RStudio Desktop: <a href="https://www.rstudio.com/products/rstudio/download/" class="uri">https://www.rstudio.com/products/rstudio/download/</a></p>
-<p>Clone this git repository:</p>
+<ol style="list-style-type: decimal">
+<li><p>Install RStudio Desktop: <a href="https://www.rstudio.com/products/rstudio/download/" class="uri">https://www.rstudio.com/products/rstudio/download/</a></p></li>
+<li><p>Clone this git repository:</p></li>
+</ol>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
 <!-- rnb-source-begin eyJkYXRhIjoiJCBnaXQgY2xvbmUgaHR0cHM6Ly9naXRodWIuY29tL3NwZGF2ZXJuLzIwMTlfRmluYW5jaWFsX1BsYW5uaW5nIn0= -->
@@ -1791,8 +1794,11 @@ $(document).ready(function () {
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>Open the “2019 Financial Planning.Rproj” R Project.<br />
-Then open one of several R notebooks (./notebooks folder) to follow and/or reproduce results or read generated reports documenting results (./reports folder).</p>
+<ol start="3" style="list-style-type: decimal">
+<li>Open the “2019 Financial Planning.Rproj” R Project.<br />
+</li>
+<li>Then, open one of several <a href="#nb">R notebooks</a> to follow and/or reproduce results or read generated reports documenting results (./reports folder).</li>
+</ol>
 </div>
 <div id="directories-and-their-contents" class="section level1">
 <h1>Directories and Their Contents</h1>
@@ -1831,9 +1837,13 @@ Then open one of several R notebooks (./notebooks folder) to follow and/or repro
 </tbody>
 </table>
 </div>
-<div id="r-notebooks" class="section level1">
+<div id="nb" class="section level1">
 <h1>R Notebooks</h1>
 <table>
+<colgroup>
+<col width="22%"></col>
+<col width="77%"></col>
+</colgroup>
 <thead>
 <tr class="header">
 <th>Notebook (.Rmd)</th>
@@ -1842,6 +1852,10 @@ Then open one of several R notebooks (./notebooks folder) to follow and/or repro
 </thead>
 <tbody>
 <tr class="odd">
+<td>README</td>
+<td>This R Notebook that summarizes the contents of the project and that produces the github flavored MarkDown making GitHub easier to consume.</td>
+</tr>
+<tr class="even">
 <td>Transfer of 2013 Analysis</td>
 <td>Convertion of modeling done in 2013 into R</td>
 </tr>
@@ -1850,8 +1864,14 @@ Then open one of several R notebooks (./notebooks folder) to follow and/or repro
 <p>Note that the corresponding notebook.nb.html is the html rendering of the .Rmd file and can be opened in a browser.</p>
 <!-- rnb-text-end -->
 </div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p><a href="https://github.com/pavopax">Paul Paczuski</a> (pavopax), <a href="https://community.rstudio.com/t/best-practices-for-organizing-rmarkdown-projects/914/11">Best Practices for Organizing RMarkdown Projects</a>, 9/20/2017.<a href="#fnref1" class="footnote-back">↩</a></p></li>
+</ol>
+</div>
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiUkVBRE1FIGZvciAyMDE5IEZpbmFuY2lhbCBQbGFubmluZyIKYXV0aG9yOiAiU2VhbiBEYXZlcm4iCmRhdGU6ICI2LzEyLzIwMTkiCm91dHB1dDoKICBodG1sX25vdGVib29rOiBkZWZhdWx0CiAgbWRfZG9jdW1lbnQ6CiAgICB2YXJpYW50OiBnZm0gICMgVGhpcyBlbmFibGVzIGtuaXR0aW5nIGEgR2l0aHViLWZsYXZvcmVkIG1kIGZpbGUuCi0tLQoKIyBPdmVydmlldwoKVGhpcyBmb2xkZXIvcmVwbyBjb250YWlucyB3b3JrIGNyZWF0ZWQgdXNpbmcgUiAodmVyLiAzLjYuMCkgYW5kIFJTdHVkaW8gKHZlci4KMS4yLjEzMzUpLgoKVGhlIHB1cnBvc2Ugb2YgdGhpcyB3b3JrIHdhcyBtdWx0aS1mb2xkOiAKCiogRXh0ZW5kIHdvcmsgZG9uZSBpbiAyMDEzIGFuZCAyMDE4IHRvIG1vZGVsIGFuZCBmb3JlY2FzdCBTZWVkIGdpdmluZyBkYXRhIGFuZCBjcmVhdGUgcHJvamVjdGlvbnMgZm9yIDIwMTgtMjAxOSBidWRnZXRpbmcgcHVycG9zZXMuCiogUHJldmlvdXMgd29yayB3YXMgZG9uZSB1c2luZyBKTVAgd2hpY2ggaXMgbm90IGFjY2Vzc2libGUgdG8gdGhvc2Ugd2l0aG91dCB0aGF0IHNvZnR3YXJlLCBpbmNsdWRpbmcgbWUgbm93LiBUcmFuc2ZlcnJpbmcgdGhpcyB3b3JrIGludG8gUiBhbGxvd3Mgc2hhcmluZyB3aXRoIG90aGVycyBhbmQgbXkgb3duIHJlLXVzZS4gCiogSeKAmW0gdXNpbmcgdGhpcyBleGVyY2lzZSB0byBkb2N1bWVudCBteSBvd24gUi9SU3R1ZGlvIHNraWxscyBhbmQgdG8gY3JlYXRlIGV4YW1wbGVzLgoKIyBTZXR1cAoKSW5zdGFsbCBSU3R1ZGlvIERlc2t0b3A6IGh0dHBzOi8vd3d3LnJzdHVkaW8uY29tL3Byb2R1Y3RzL3JzdHVkaW8vZG93bmxvYWQvICAKCkNsb25lIHRoaXMgZ2l0IHJlcG9zaXRvcnk6CmBgYHtiYXNoIGV2YWw9RkFMU0V9CiQgZ2l0IGNsb25lIGh0dHBzOi8vZ2l0aHViLmNvbS9zcGRhdmVybi8yMDE5X0ZpbmFuY2lhbF9QbGFubmluZwpgYGAKCk9wZW4gdGhlICIyMDE5IEZpbmFuY2lhbCBQbGFubmluZy5ScHJvaiIgUiBQcm9qZWN0LiAgClRoZW4gb3BlbiBvbmUgb2Ygc2V2ZXJhbCBSIG5vdGVib29rcyAoLi9ub3RlYm9va3MgZm9sZGVyKSB0byBmb2xsb3cgYW5kL29yIHJlcHJvZHVjZSByZXN1bHRzIG9yIHJlYWQgZ2VuZXJhdGVkIHJlcG9ydHMgZG9jdW1lbnRpbmcgcmVzdWx0cyAoLi9yZXBvcnRzIGZvbGRlcikuCgojIERpcmVjdG9yaWVzIGFuZCBUaGVpciBDb250ZW50cwoKfEZvbGRlcnxDb250ZW50c3wKfDotLS0tOnwtLS0tLS0tLXwKfC4vfFJvb3QgcHJvamVjdCBkaXJlY3Rvcnl8CnwuL2NvZGV8UiBzY3JpcHRzIGNyZWF0ZWQgZm9yIHRoZSBwcm9qZWN0fAp8Li9kYXRhfFNvdXJjZSBkYXRhIGZvciBhbmFseXNpcyBhcyB3ZWxsIGFzIHNhdmVkIFIgT2JqZWN0c3wKfC4vbm90ZWJvb2tzfFIgTm90ZWJvb2tzIGNvdmVyaW5nIGVhY2ggcGFydCBvZiB0aGUgcHJvamVjdCB3b3JrfAp8Li9wYWNrcmF0fFJlcXVpcmVkIFIgcGFja2FnZSByZXBvc2l0b3J5fAp8Li9yZXBvcnRzfERvY3VtZW50YXRpb24gb2YgbWV0aG9kcyBhbmQgcmVzdWx0c3wKCiMgUiBOb3RlYm9va3MKCnxOb3RlYm9vayAoLlJtZCl8RGVzY3JpcHRpb24gb2YgV29yayBDb3ZlcmVkfAp8LS0tLS0tLS18LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tfAp8VHJhbnNmZXIgb2YgMjAxMyBBbmFseXNpc3xDb252ZXJ0aW9uIG9mIG1vZGVsaW5nIGRvbmUgaW4gMjAxMyBpbnRvIFJ8Ck5vdGUgdGhhdCB0aGUgY29ycmVzcG9uZGluZyBub3RlYm9vay5uYi5odG1sIGlzIHRoZSBodG1sIHJlbmRlcmluZyBvZiB0aGUgLlJtZCBmaWxlIGFuZCBjYW4gYmUgb3BlbmVkIGluIGEgYnJvd3Nlci4=</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiUkVBRE1FIGZvciAyMDE5IEZpbmFuY2lhbCBQbGFubmluZyIKYXV0aG9yOiAiU2VhbiBEYXZlcm4iCmRhdGU6ICI2LzEyLzIwMTkiCm91dHB1dDoKICBtZF9kb2N1bWVudDoKICAgIHZhcmlhbnQ6IGdmbSAgIyBUaGlzIGVuYWJsZXMga25pdHRpbmcgYSBHaXRodWItZmxhdm9yZWQgbWQgZmlsZS4KICBodG1sX25vdGVib29rOiBkZWZhdWx0CiAgaHRtbF9kb2N1bWVudDogZGVmYXVsdAotLS0KCiMgT3ZlcnZpZXcKClRoaXMgZm9sZGVyL3JlcG8gY29udGFpbnMgd29yayBjcmVhdGVkIHVzaW5nIFIgKHZlci4gMy42LjApIGFuZCBSU3R1ZGlvICh2ZXIuCjEuMi4xMzM1KS4KClRoZSBwdXJwb3NlIG9mIHRoaXMgd29yayB3YXMgbXVsdGktZm9sZDogCgoqIEV4dGVuZCB3b3JrIGRvbmUgaW4gMjAxMyBhbmQgMjAxOCB0byBtb2RlbCBhbmQgZm9yZWNhc3QgU2VlZCBnaXZpbmcgZGF0YSBhbmQgY3JlYXRlIHByb2plY3Rpb25zIGZvciAyMDE4LTIwMTkgYnVkZ2V0aW5nIHB1cnBvc2VzLgoqIFByZXZpb3VzIHdvcmsgd2FzIGRvbmUgdXNpbmcgSk1QIHdoaWNoIGlzIG5vdCBhY2Nlc3NpYmxlIHRvIHRob3NlIHdpdGhvdXQgdGhhdCBzb2Z0d2FyZSwgaW5jbHVkaW5nIG1lIG5vdy4gVHJhbnNmZXJyaW5nIHRoaXMgd29yayBpbnRvIFIgYWxsb3dzIHNoYXJpbmcgd2l0aCBvdGhlcnMgYW5kIG15IG93biByZS11c2UuIAoqIEnigJltIHVzaW5nIHRoaXMgZXhlcmNpc2UgdG8gZG9jdW1lbnQgbXkgb3duIFIvUlN0dWRpbyBza2lsbHMgYW5kIHRvIGNyZWF0ZSBleGFtcGxlcy4gIEkgYW0gZXhwZXJpbWVudGluZyB3aXRoIGEgYmxlbmQgb2YgW2xpdGVyYXRlIHByb2dyYW1taW5nXShodHRwczovL2VuLndpa2lwZWRpYS5vcmcvd2lraS9MaXRlcmF0ZV9wcm9ncmFtbWluZykgYW5kIGNvZGluZy1saWtlIHByb2plY3Qgb3JnYW5pemF0aW9uIHN1Z2dlc3RlZCBieSBwYXZvcGF4LlteMV0KClRoaXMgcHJvamVjdCB1c2VzIFtnaXRdKGh0dHBzOi8vZ2l0LXNjbS5jb20vKSBmb3IgdmVyc2lvbiBjb250cm9sIGFuZCAgW3BhY2tyYXRdKGh0dHBzOi8vcnN0dWRpby5naXRodWIuaW8vcGFja3JhdC8pIGZvciBwYWNrYWdlIGRlcGVuZGVuY3kgbWFuYWdlbWVudC4KClteMV06IFtQYXVsIFBhY3p1c2tpXShodHRwczovL2dpdGh1Yi5jb20vcGF2b3BheCkgKHBhdm9wYXgpLCBbQmVzdCBQcmFjdGljZXMgZm9yIE9yZ2FuaXppbmcgUk1hcmtkb3duIFByb2plY3RzXShodHRwczovL2NvbW11bml0eS5yc3R1ZGlvLmNvbS90L2Jlc3QtcHJhY3RpY2VzLWZvci1vcmdhbml6aW5nLXJtYXJrZG93bi1wcm9qZWN0cy85MTQvMTEpLCA5LzIwLzIwMTcuCgojIFNldHVwCgoxLiBJbnN0YWxsIFJTdHVkaW8gRGVza3RvcDogaHR0cHM6Ly93d3cucnN0dWRpby5jb20vcHJvZHVjdHMvcnN0dWRpby9kb3dubG9hZC8gIAoKMi4gQ2xvbmUgdGhpcyBnaXQgcmVwb3NpdG9yeToKYGBge2Jhc2ggZXZhbD1GQUxTRX0KJCBnaXQgY2xvbmUgaHR0cHM6Ly9naXRodWIuY29tL3NwZGF2ZXJuLzIwMTlfRmluYW5jaWFsX1BsYW5uaW5nCmBgYAoKMy4gT3BlbiB0aGUgIjIwMTkgRmluYW5jaWFsIFBsYW5uaW5nLlJwcm9qIiBSIFByb2plY3QuICAKNC4gVGhlbiwgb3BlbiBvbmUgb2Ygc2V2ZXJhbCBbUiBub3RlYm9va3NdKCNuYikgdG8gZm9sbG93IGFuZC9vciByZXByb2R1Y2UgcmVzdWx0cyBvciByZWFkIGdlbmVyYXRlZCByZXBvcnRzIGRvY3VtZW50aW5nIHJlc3VsdHMgKC4vcmVwb3J0cyBmb2xkZXIpLgoKIyBEaXJlY3RvcmllcyBhbmQgVGhlaXIgQ29udGVudHMKCnxGb2xkZXJ8Q29udGVudHN8Cnw6LS0tLTp8LS0tLS0tLS18CnwuL3xSb290IHByb2plY3QgZGlyZWN0b3J5fAp8Li9jb2RlfFIgc2NyaXB0cyBjcmVhdGVkIGZvciB0aGUgcHJvamVjdHwKfC4vZGF0YXxTb3VyY2UgZGF0YSBmb3IgYW5hbHlzaXMgYXMgd2VsbCBhcyBzYXZlZCBSIE9iamVjdHN8CnwuL25vdGVib29rc3xSIE5vdGVib29rcyBjb3ZlcmluZyBlYWNoIHBhcnQgb2YgdGhlIHByb2plY3Qgd29ya3wKfC4vcGFja3JhdHxSZXF1aXJlZCBSIHBhY2thZ2UgcmVwb3NpdG9yeXwKfC4vcmVwb3J0c3xEb2N1bWVudGF0aW9uIG9mIG1ldGhvZHMgYW5kIHJlc3VsdHN8CgojIFIgTm90ZWJvb2tzICB7I25ifQoKfE5vdGVib29rICguUm1kKXxEZXNjcmlwdGlvbiBvZiBXb3JrIENvdmVyZWR8CnwtLS0tLS0tLXwtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS18CnxSRUFETUV8VGhpcyBSIE5vdGVib29rIHRoYXQgc3VtbWFyaXplcyB0aGUgY29udGVudHMgb2YgdGhlIHByb2plY3QgYW5kIHRoYXQgcHJvZHVjZXMgdGhlIGdpdGh1YiBmbGF2b3JlZCBNYXJrRG93biBtYWtpbmcgR2l0SHViIGVhc2llciB0byBjb25zdW1lLnwKfFRyYW5zZmVyIG9mIDIwMTMgQW5hbHlzaXN8Q29udmVydGlvbiBvZiBtb2RlbGluZyBkb25lIGluIDIwMTMgaW50byBSfAoKCk5vdGUgdGhhdCB0aGUgY29ycmVzcG9uZGluZyBub3RlYm9vay5uYi5odG1sIGlzIHRoZSBodG1sIHJlbmRlcmluZyBvZiB0aGUgLlJtZCBmaWxlIGFuZCBjYW4gYmUgb3BlbmVkIGluIGEgYnJvd3Nlci4=</div>
 
 
 

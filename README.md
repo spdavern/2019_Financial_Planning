@@ -11,23 +11,31 @@ The purpose of this work was multi-fold:
     without that software, including me now. Transferring this work into
     R allows sharing with others and my own re-use.
   - I’m using this exercise to document my own R/RStudio skills and to
-    create examples.
+    create examples. I am experimenting with a blend of [literate
+    programming](https://en.wikipedia.org/wiki/Literate_programming) and
+    coding-like project organization suggested by pavopax.\[1\]
+
+This project uses [git](https://git-scm.com/) for version control and
+[packrat](https://rstudio.github.io/packrat/) for package dependency
+management.
 
 # Setup
 
-Install RStudio Desktop:
-<https://www.rstudio.com/products/rstudio/download/>
+1.  Install RStudio Desktop:
+    <https://www.rstudio.com/products/rstudio/download/>
 
-Clone this git repository:
+2.  Clone this git repository:
+
+<!-- end list -->
 
 ``` bash
 $ git clone https://github.com/spdavern/2019_Financial_Planning
 ```
 
-Open the “2019 Financial Planning.Rproj” R Project.  
-Then open one of several R notebooks (./notebooks folder) to follow
-and/or reproduce results or read generated reports documenting results
-(./reports folder).
+3.  Open the “2019 Financial Planning.Rproj” R Project.  
+4.  Then, open one of several [R notebooks](#nb) to follow and/or
+    reproduce results or read generated reports documenting results
+    (./reports folder).
 
 # Directories and Their Contents
 
@@ -42,9 +50,15 @@ and/or reproduce results or read generated reports documenting results
 
 # R Notebooks
 
-| Notebook (.Rmd)           | Description of Work Covered                |
-| ------------------------- | ------------------------------------------ |
-| Transfer of 2013 Analysis | Convertion of modeling done in 2013 into R |
+| Notebook (.Rmd)           | Description of Work Covered                                                                                                                 |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| README                    | This R Notebook that summarizes the contents of the project and that produces the github flavored MarkDown making GitHub easier to consume. |
+| Transfer of 2013 Analysis | Convertion of modeling done in 2013 into R                                                                                                  |
 
 Note that the corresponding notebook.nb.html is the html rendering of
 the .Rmd file and can be opened in a browser.
+
+1.  [Paul Paczuski](https://github.com/pavopax) (pavopax), [Best
+    Practices for Organizing RMarkdown
+    Projects](https://community.rstudio.com/t/best-practices-for-organizing-rmarkdown-projects/914/11),
+    9/20/2017.
