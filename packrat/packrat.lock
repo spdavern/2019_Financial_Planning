@@ -97,7 +97,6 @@ Hash: 660bbbe3803c7cf7c9489a7d99a9c0ed
 Package: gridExtra
 Source: CRAN
 Version: 2.3
-Hash: fa977bc1aab5588a08123b10ceb1ad3d
 Requires: gtable
 
 Package: gtable
@@ -150,14 +149,14 @@ Hash: bdc4d48c3135e8f3b399536ddf160df4
 
 Package: markdown
 Source: CRAN
-Version: 0.9
-Hash: 730f688930cef3223d59bd8aef679ab9
+Version: 1.0
+Hash: fe604255cb83cac629aed0569c9df922
 Requires: mime
 
 Package: mime
 Source: CRAN
-Version: 0.6
-Hash: 2ed8f98b8284ad733f3907fc6e2f1334
+Version: 0.7
+Hash: 0d7563caf453c231b6f8c359c51eecc2
 
 Package: munsell
 Source: CRAN
@@ -258,8 +257,8 @@ Requires: glue, magrittr, stringi
 
 Package: tibble
 Source: CRAN
-Version: 2.1.2
-Hash: 2835a4230fd49a0bc31370e95ed35938
+Version: 2.1.3
+Hash: f59680d81ddc45fa3fcb8c07686d1d89
 Requires: cli, crayon, fansi, pillar, pkgconfig, rlang
 
 Package: tidyselect
