@@ -3,10 +3,10 @@ title: "Transferring 2013 Analysis to R"
 author: "Sean Davern"
 date: "June 5, 2019"
 output:
+  html_notebook: default
   html_document:
     df_print: paged
   pdf_document: default
-  html_notebook: default
 references:
 - id: davern2013
   title: An Assessment of Requested Seed Core Support for Expansion Based on Analysis of Giving
@@ -89,9 +89,9 @@ saveRDS(df, file = "../data/Cleaned and Transformed Giving Data.rds")
 \newpage
 # Replicating Previous Modeling
 The relatively simple model derived in 2013 [see @davern2013, pg. 11] and used again in 2018 used this model:
-$$\text{Monthly Giving} = a_1+b_{year}+c_{month}$$
-where $a_1$ is an overall grand average of the monthly giving amount, $b_{year}$ is an adjustment for the given year and $c_{month}$ is an adjustment for the month. The model was originally regressed on giving data from Jan 2010 through August 2013 excluding 3 high-fliers with known exceptional donations.
-We can now regress this model:
+$$\textit{Monthly Giving} = a+b_{year}+c_{month}$$
+where $a$ is an overall grand average of the monthly giving amount, $b_{year}$ is an adjustment for the given year and $c_{month}$ is an adjustment for the month. The model was originally regressed on giving data from Jan 2010 through August 2013 excluding 3 high-fliers with known exceptional donations.  
+The R function lm uses a similar model except where $a$ is the predicted Jan 2011 giving amount, so $b_{2011}=0$ and $c_{January}=0$.  Regressing this model:
 
 ```{r}
 library("magrittr")
@@ -184,7 +184,7 @@ grid.arrange(plot2, plot3, plot4, plot1, ncol=2, nrow=2)
 # plot_grid(plot2, plot3, plot4, labels = "AUTO")
 summary(mod)
 ```
-The results obtained are different in a number of ways from what was obtained in 2013.  The general fit (residuals) and shape of the predicted values are similar to that obtained in 2013 though the June predictions seem further away than the other months.  The regressed coefficients are obviously very different, but this is largely due to the method JMP uses for regressing factor coefficients.  However, the difference in the June predictions and slightly different factor p-values tells me that something in the underlying data is probably different.  I'm not going to spend the time to diagnose the precise details of the difference since the objective is to translate the analysis to R rather than reproduce it. 
+The results obtained are different in a number of ways from what was obtained in 2013.  The general fit (residuals) and shape of the predicted values are similar to that obtained in 2013 though the June predictions seem further away than the other months.  The regressed coefficients are obviously very different, but this is largely due to the method JMP uses for regressing factor coefficients.  However, the difference in the June predictions and slightly different factor p-values tells me that something in the underlying data is probably different.  I'm not going to spend the time to diagnose the precise details of the difference since the objective is to translate the analysis to R rather than reproduce JMP. 
 
 
 # References

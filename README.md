@@ -53,7 +53,7 @@ $ git clone https://github.com/spdavern/2019_Financial_Planning
 | Notebook (.Rmd)           | Description of Work Covered                                                                                                                 |
 | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
 | README                    | This R Notebook that summarizes the contents of the project and that produces the github flavored MarkDown making GitHub easier to consume. |
-| Transfer of 2013 Analysis | Convertion of modeling done in 2013 into R                                                                                                  |
+| Transfer of 2013 Analysis | Convertion of modeling done in 2013 into R. Uses the model: \(\textit{Monthly Giving} = a+b_{year}+c_{month}\)                              |
 
 Note that the corresponding notebook.nb.html is the html rendering of
 the .Rmd file and can be opened in a browser.

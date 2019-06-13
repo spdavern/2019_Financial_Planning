@@ -1724,7 +1724,8 @@ saveRDS(df, file = &quot;../data/Cleaned and Transformed Giving Data.rds&quot;)<
 </div>
 <div id="replicating-previous-modeling" class="section level1">
 <h1>Replicating Previous Modeling</h1>
-<p>The relatively simple model derived in 2013 <span class="citation">(see Davern 2013, pg. 11)</span> and used again in 2018 used this model: <span class="math display">\[\text{Monthly Giving} = a_1+b_{year}+c_{month}\]</span> where <span class="math inline">\(a_1\)</span> is an overall grand average of the monthly giving amount, <span class="math inline">\(b_{year}\)</span> is an adjustment for the given year and <span class="math inline">\(c_{month}\)</span> is an adjustment for the month. The model was originally regressed on giving data from Jan 2010 through August 2013 excluding 3 high-fliers with known exceptional donations. We can now regress this model:</p>
+<p>The relatively simple model derived in 2013 <span class="citation">(see Davern 2013, pg. 11)</span> and used again in 2018 used this model: <span class="math display">\[\textit{Monthly Giving} = a+b_{year}+c_{month}\]</span> where <span class="math inline">\(a\)</span> is an overall grand average of the monthly giving amount, <span class="math inline">\(b_{year}\)</span> is an adjustment for the given year and <span class="math inline">\(c_{month}\)</span> is an adjustment for the month. The model was originally regressed on giving data from Jan 2010 through August 2013 excluding 3 high-fliers with known exceptional donations.<br />
+The R function lm uses a similar model except where <span class="math inline">\(a\)</span> is the predicted Jan 2011 giving amount, so <span class="math inline">\(b_{2011}=0\)</span> and <span class="math inline">\(c_{January}=0\)</span>. Regressing this model:</p>
 <pre class="r"><code>library(&quot;magrittr&quot;)
 # Pair the data down to that used in the original analysis
 df2 &lt;- df[as.Date(df$week.ending) &gt; &quot;2010-01-01&quot; &amp; 
@@ -1780,7 +1781,7 @@ mod &lt;- lm(
 ## Residual standard error: 2219 on 26 degrees of freedom
 ## Multiple R-squared:  0.4729, Adjusted R-squared:  0.1892 
 ## F-statistic: 1.666 on 14 and 26 DF,  p-value: 0.1261</code></pre>
-<p>The results obtained are different in a number of ways from what was obtained in 2013. The general fit (residuals) and shape of the predicted values are similar to that obtained in 2013 though the June predictions seem further away than the other months. The regressed coefficients are obviously very different, but this is largely due to the method JMP uses for regressing factor coefficients. However, the difference in the June predictions and slightly different factor p-values tells me that something in the underlying data is probably different. I’m not going to spend the time to diagnose the precise details of the difference since the objective is to translate the analysis to R rather than reproduce it.</p>
+<p>The results obtained are different in a number of ways from what was obtained in 2013. The general fit (residuals) and shape of the predicted values are similar to that obtained in 2013 though the June predictions seem further away than the other months. The regressed coefficients are obviously very different, but this is largely due to the method JMP uses for regressing factor coefficients. However, the difference in the June predictions and slightly different factor p-values tells me that something in the underlying data is probably different. I’m not going to spend the time to diagnose the precise details of the difference since the objective is to translate the analysis to R rather than reproduce JMP.</p>
 </div>
 <div id="references" class="section level1 unnumbered">
 <h1>References</h1>
