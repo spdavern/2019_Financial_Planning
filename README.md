@@ -18,7 +18,7 @@ The purpose of this work was multi-fold:
 Install RStudio Desktop:
 <https://www.rstudio.com/products/rstudio/download/>
 
-Clone this git repository: \<not pushed to github yet\>
+Clone this git repository:
 
 ``` bash
 $ git clone https://github.com/spdavern/2019_Financial_Planning
