@@ -32,21 +32,21 @@ management.
 $ git clone https://github.com/spdavern/2019_Financial_Planning
 ```
 
-3.  Open the “2019 Financial Planning.Rproj” R Project.  
+3.  Open the “2019 Financial Planning.Rproj” R Project in RStudio.  
 4.  Then, open one of several [R notebooks](#nb) to follow and/or
     reproduce results or read generated reports documenting results
     (./reports folder).
 
 # Directories and Their Contents
 
-|   Folder    | Contents                                            |
-| :---------: | --------------------------------------------------- |
-|     ./      | Root project directory                              |
-|   ./code    | R scripts created for the project                   |
-|   ./data    | Source data for analysis as well as saved R Objects |
-| ./notebooks | R Notebooks covering each part of the project work  |
-|  ./packrat  | Required R package repository                       |
-|  ./reports  | Documentation of methods and results                |
+|   Folder    | Contents                                               |
+| :---------: | ------------------------------------------------------ |
+|     ./      | Root project directory (Contains the README notebook.) |
+|   ./code    | R scripts created for the project                      |
+|   ./data    | Source data for analysis as well as saved R Objects    |
+| ./notebooks | R Notebooks covering each part of the project work     |
+|  ./packrat  | Required R package repository                          |
+|  ./reports  | Documentation of methods and results                   |
 
 # R Notebooks
 
@@ -57,6 +57,8 @@ $ git clone https://github.com/spdavern/2019_Financial_Planning
 
 Note that the corresponding notebook.nb.html is the html rendering of
 the .Rmd file and can be opened in a browser.
+
+# Footnotes
 
 1.  [Paul Paczuski](https://github.com/pavopax) (pavopax), [Best
     Practices for Organizing RMarkdown
