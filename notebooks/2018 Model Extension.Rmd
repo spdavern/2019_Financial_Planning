@@ -1,7 +1,7 @@
 ---
 title: "2018 Model Extension"
 author: "Sean Davern"
-date: "June 13, 2019"
+date: "June 15, 2019"
 output:
   html_document:
     df_print: paged
@@ -53,13 +53,13 @@ mod <- lm(
 
 ```{r echo=FALSE}
 library("magrittr")
-library("ggplot2")
+suppressMessages(library("ggplot2", quietly = TRUE, warn.conflicts = FALSE))
 library("RColorBrewer")
 cbPalette <- brewer.pal(12,"Paired")  # Used http://colorbrewer2.org/
 names(cbPalette) <- levels(month.name)
 colScale <- scale_color_manual(name = "month", values = cbPalette)
 t.size <- 9
-df$week.ending <- as.Date(df$week.ending, "%Y-%m-%d")
+df$week.ending <- as.Date(df$week.ending, "%Y-%m-%d", tz="UTC")
 # The model's predicted values don't have values at the excluded months.
 # Calculate those:
 df <- mutate(df, predicted.values = predict(mod,df)) %>%
@@ -82,10 +82,11 @@ ggplot(df, aes(x = as.Date(week.ending), y = total, color=month )) +
 ```
 In this case it is far more clear that giving was increasing through 2016 which would be expected to improve the statistical significance of the $year$ model term over what was seen in the 2013 analysis.
 
+\newpage
 # Model Fit Assessment
 
 ```{r echo=FALSE}
-library("gridExtra")
+library("gridExtra", quietly=TRUE, warn.conflicts = FALSE)
 anova(mod)
 plot1 <- ggplot(mod, aes(sample = mod$residuals)) +
   stat_qq() + 
