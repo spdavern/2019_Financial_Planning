@@ -11,7 +11,7 @@
 
 <meta name="author" content="Sean Davern" />
 
-<meta name="date" content="2019-06-15" />
+<meta name="date" content="2019-06-18" />
 
 <title>2018 Model Extension</title>
 
@@ -1648,7 +1648,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">2018 Model Extension</h1>
 <h4 class="author">Sean Davern</h4>
-<h4 class="date">June 15, 2019</h4>
+<h4 class="date">June 18, 2019</h4>
 
 </div>
 
@@ -1753,33 +1753,13 @@ df$total &lt;- df$original.total - df$removed.amount
 </div>
 <div id="model-generalization" class="section level1">
 <h1>Model Generalization</h1>
-<p>Due to R’s conventions, the model coefficients, as regressed by R: <span class="math display">\[\textit{Monthly Giving} = a+b_{year}+c_{month}\]</span> are regressed relative to <span class="math inline">\(month_1\)</span>=January (<span class="math inline">\(c_{January}=0\)</span>) and <span class="math inline">\(year_1\)</span>=2010 (<span class="math inline">\(b_{2010}=0\)</span>). This is why there is no year2010 nor monthJanuary coeffiencients. A more useful set of references for forecasting would be “an average month” and “an average year”. Thus we can modify the model as such: <span class="math display">\[
-\begin{aligned}
-\begin{split}
+<p>We can generalize the model again, as described in the “Transfer of 2013 Analysis” Notebook, by shifting the coefficients to the average month and year like this: <span class="math display">\[
 \textit{Monthly Giving} 
-&amp;= a+(\overline{b_{year}}+b_{year}-\overline{b_{year}})+
-(\overline{c_{month}}+c_{month}-\overline{c_{month}})
-\\
-&amp;= \big[a+\overline{b_{year}}+\overline{c_{month}}\big]+
+= \big[a+\overline{b_{year}}+\overline{c_{month}}\big]+
 \big(b_{year}-\overline{b_{year}}\big)+
 \big(c_{month}-\overline{c_{month}}\big)
-\end{split}
-\end{aligned}
-\]</span> where <span class="math inline">\(\overline{b_{year}}\)</span> is the mean of <span class="math inline">\(b_{year}\)</span> coefficients, including <span class="math inline">\(b_{2010}=0\)</span>, and <span class="math inline">\(\overline{c_{month}}\)</span> is the mean of the <span class="math inline">\(c_{year}\)</span> coefficients, including <span class="math inline">\(c_{January}=0\)</span>. The term <span class="math inline">\(\big[a+\overline{b_{year}}+\overline{c_{month}}\big]\)</span> is then the regressed <span class="math inline">\(\textit{Monthly Giving}\)</span> for an average month in an average year over the period covered by the data. Of course no actual month or year is the average, and to reproduce a given month and year prediction the shifted coefficients <span class="math inline">\((b_{year}-\overline{b_{year}}) \text{ and } (c_{month}-\overline{c_{month}})\)</span> must be employed. However, this facilitates using the model for monthly variance predictions in the upcoming year since: <span class="math display">\[
-\begin{aligned}
-\begin{split}
-\textit{Average Monthly Giving}_\textit{next year}
-&amp;=\big[a+\overline{b_{year}}+\overline{c_{month}}\big]+\big(b_\textit{next year}-\overline{b_{year}}\big)
-\\
-&amp;=\frac{\textit{Projected Income}_\textit{next year}}{12}
-\end{split}
-\end{aligned}
-\]</span> So even though we don’t know <span class="math inline">\(b_\textit{next year}\)</span> we can make an estimation for next year’s total <span class="math inline">\(\textit{Projected Income}\)</span> and get monthly estimates based on the annual estimate:</p>
-<p><span class="math display">\[
-\textit{Monthly Giving}_\textit{next year}
-=\frac{\textit{Projected Income}_\textit{next year}}{12} + 
-\big(c_{month}-\overline{c_{month}}\big)
-\]</span></p>
+\]</span> where <span class="math inline">\(\overline{b_{year}}\)</span> is the mean of <span class="math inline">\(b_{year}\)</span> coefficients, including <span class="math inline">\(b_{2010}=0\)</span>, and <span class="math inline">\(\overline{c_{month}}\)</span> is the mean of the <span class="math inline">\(c_{year}\)</span> coefficients, including <span class="math inline">\(c_{January}=0\)</span>.</p>
+
 </div>
 <div id="monthly-variation" class="section level1">
 <h1>Monthly Variation</h1>

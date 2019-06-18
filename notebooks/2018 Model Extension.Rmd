@@ -1,12 +1,12 @@
 ---
 title: "2018 Model Extension"
 author: "Sean Davern"
-date: "June 15, 2019"
+date: "June 18, 2019"
 output:
   html_document:
     df_print: paged
-  pdf_document: default
   html_notebook: default
+  pdf_document: default
 ---
 # Overview
 
@@ -137,48 +137,16 @@ Both model terms are highly statistically significant.  The residuals seem nicel
 summary(mod)
 ```
 # Model Generalization
-
-```{r, include=FALSE}
-# Needed this code to get more detail on why knitting pdf was failing.
-# Source: https://yihui.name/tinytex/r/#debugging
-options(tinytex.verbose = TRUE)
-# Solution came from: https://stackoverflow.com/questions/26049762/erroneous-nesting-of-equation-structures-in-using-beginalign-in-a-multi-l
-```
-Due to R's conventions, the model coefficients, as regressed by R:
-$$\textit{Monthly Giving} = a+b_{year}+c_{month}$$
-are regressed relative to $month_1$=January ($c_{January}=0$) and $year_1$=2010 ($b_{2010}=0$). This is why there is no year2010 nor monthJanuary coeffiencients.  A more useful set of references for forecasting would be "an average month" and "an average year".  Thus we can modify the model as such:
+We can generalize the model again, as described in the "Transfer of 2013 Analysis" Notebook, by shifting the coefficients to the average month and year like this:
 $$
-\begin{aligned}
-\begin{split}
 \textit{Monthly Giving} 
-&= a+(\overline{b_{year}}+b_{year}-\overline{b_{year}})+
-(\overline{c_{month}}+c_{month}-\overline{c_{month}})
-\\
-&= \big[a+\overline{b_{year}}+\overline{c_{month}}\big]+
+= \big[a+\overline{b_{year}}+\overline{c_{month}}\big]+
 \big(b_{year}-\overline{b_{year}}\big)+
 \big(c_{month}-\overline{c_{month}}\big)
-\end{split}
-\end{aligned}
 $$
-where $\overline{b_{year}}$ is the mean of $b_{year}$ coefficients, including $b_{2010}=0$, and $\overline{c_{month}}$ is the mean of the $c_{year}$ coefficients, including $c_{January}=0$. The term $\big[a+\overline{b_{year}}+\overline{c_{month}}\big]$ is then the regressed $\textit{Monthly Giving}$ for an average month in an average year over the period covered by the data.  Of course no actual month or year is the average, and to reproduce a given month and year prediction the shifted coefficients $(b_{year}-\overline{b_{year}}) \text{ and } (c_{month}-\overline{c_{month}})$ must be employed.  However, this facilitates using the model for monthly variance predictions in the upcoming year since:
-$$
-\begin{aligned}
-\begin{split}
-\textit{Average Monthly Giving}_\textit{next year}
-&=\big[a+\overline{b_{year}}+\overline{c_{month}}\big]+\big(b_\textit{next year}-\overline{b_{year}}\big)
-\\
-&=\frac{\textit{Projected Income}_\textit{next year}}{12}
-\end{split}
-\end{aligned}
-$$
-So even though we don't know $b_\textit{next year}$ we can make an estimation for next year's total $\textit{Projected Income}$ and get monthly estimates based on the annual estimate:
+where $\overline{b_{year}}$ is the mean of $b_{year}$ coefficients, including $b_{2010}=0$, and $\overline{c_{month}}$ is the mean of the $c_{year}$ coefficients, including $c_{January}=0$. 
 
-$$
-\textit{Monthly Giving}_\textit{next year}
-=\frac{\textit{Projected Income}_\textit{next year}}{12} + 
-\big(c_{month}-\overline{c_{month}}\big)
-$$
-
+\newpage
 # Monthly Variation
 This plot shows the resulting $month$ regression coeffiecients shifted by $\overline{c_{month}}$ capturing month-to-month variation. ($(c_{month}-\overline{c_{month}})$)   The shape of the yearly repeated pattern in the prediction are the result of these terms.
 
