@@ -29,7 +29,7 @@ df <- mutate(df,
 ```
 
 # Accommodating Unusual Gift
-12/26/2016 had an unusual single gift skewing analyses.  Other large gifts have been recieved over this period but this gift was at least twice all others. I'm removing the amount of the unusual gift from the month's total.  Previously I excluded that month all-together, but I've commented that line out so no values are excluded.
+12/26/2016 had an unusual single gift skewing analyses.  Other large gifts have been recieved over this period but this gift was 50% larger than all others. I'm removing the amount of the unusual gift from the month's total.  Previously I excluded that month all-together, but I've commented that line out so no values are excluded.
 ```{r}
 df$removed.amount[as.Date(df$week.ending) == "2016-12-25"] <- 20000
 df$total <- df$original.total - df$removed.amount
