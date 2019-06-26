@@ -3,10 +3,10 @@ title: "README for 2019 Financial Planning"
 author: "Sean Davern"
 date: "6/12/2019"
 output:
+  html_document: default
+  html_notebook: default
   md_document:
     variant: gfm  # This enables knitting a Github-flavored md file.
-  html_notebook: default
-  html_document: default
 ---
 
 # Overview
@@ -49,7 +49,7 @@ $ git clone https://github.com/spdavern/2019_Financial_Planning
 
 # R Notebooks  {#nb}
 
-[Link to this README file](https://github.com/spdavern/2019_Financial_Planning/blob/master/README.html) which renders the equations in the table below properly.
+[Link to this README file](http://htmlpreview.github.io/?https://github.com/spdavern/2019_Financial_Planning/blob/master/README.html) which renders the equations in the table below properly.
 
 |Notebook (.Rmd)|Description of Work Covered|
 |--------|---------------------------|

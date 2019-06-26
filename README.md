@@ -51,7 +51,7 @@ $ git clone https://github.com/spdavern/2019_Financial_Planning
 # R Notebooks
 
 [Link to this README
-file](https://github.com/spdavern/2019_Financial_Planning/blob/master/README.html)
+file](http://htmlpreview.github.io/?https://github.com/spdavern/2019_Financial_Planning/blob/master/README.html)
 which renders the equations in the table below
 properly.
 
