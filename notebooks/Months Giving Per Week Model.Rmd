@@ -7,10 +7,10 @@ output:
     df_print: paged
     toc: true
     toc_float: true
+  html_notebook: default
   pdf_document: 
     df_print: kable
     toc: true
-  html_notebook: default
 ---
 # Overview
 
@@ -74,6 +74,7 @@ plot1 <- ggplot(df, aes(x = as.Date(week.ending),
         axis.text.x = element_text(angle=45, hjust=1))
 plot1
 ```
+
 This chart seems to show increasing variation over time especially if the high November and December 2016 data is not anomolous.  Following [methods recommended by NIST](https://www.itl.nist.gov/div898/handbook/pmd/section6/pmd633.htm) the following plots allow assessing heteroscedasticity for potential measure transformations (square root, natural log, and inverse (1/x)):
 
 ```{r}
@@ -145,6 +146,7 @@ grid.arrange(plotBase,
              ncol=2, nrow=2,
              top = "Transformations of Monthly Giving Per Week Per Family")
 ```
+
 None of the transformations are dramatically better heterscadicity.  Of particular question is whether the trend in the measure is mostly linear through the entire period or if it flattens and perhaps even begins to decrease.  Keep in mind, this isn't the total giving, that definitely decreases into 2018.  This is whether the average giving per week per family decreases.  Such a shift could be a signal of decreased faith in the church or a byproduct of the nature of the giving by the collection of families making up the congregation.  Anyway, the end of 2016 high values in all cases seem to be slightly anamolous even though I've alread removed the single large gift in December 2016.  Despite the similarities in variance consistency, I'm going to move forward with the log transformation because it seem slightly better than untransformed.
 
 # Modeling
@@ -212,6 +214,7 @@ grid.arrange(plot2, plot3, plot4, plot1, ncol=2, nrow=2)
 anova(mod)
 summary(mod)
 ```
+
 This fit looks reasonably good though the normal quantile plot shows slightly heavy distribution tails.  High a low months are not predicted as well.  The model clearly differentiates month giving as shown by the significance of the month coefficient terms (see both ANOVA table and coefficients table).
 
 # Model Predictions for Monthly Total Giving
@@ -290,12 +293,14 @@ plot4 <- ggplot(df, aes(x = as.Date(week.ending),
         axis.text.x = element_text(angle=45, hjust=1))
 grid.arrange(plot2, plot3, plot4, plot1, ncol=2, nrow=2)
 ```
+
 The Residuals by Predicted Plot, in particular, shows the highest giving is over predicted.  This could possibly be caused by including a number of other larger donations that might have been one-time donations not representative of "regular" giving.  However, those obviously happen occassionally so including them causes the model to predict presuming they will happen.
 
 The overall model root mean square error (RSME) in the modeled monthly giving is:
 ```{r echo=FALSE}
 noquote(paste("$",format(sqrt(mean(df$residual.values^2)),big.mark = ",")))
 ```
+
 This value is helpful in establishing an income variability fund to offset giving variation.  The RSME is a good, non-biased estimator of the standard deviation ($\sigma$) of the distribution of residuals.  The normal quantile plot above shows the majority of the residual distribution are normally distributed.  While the tails (residuals at the high and low end of giving) are more common than a normal distribution, the high giving is more common than the lows.
 
 \newpage
@@ -480,6 +485,7 @@ ggplot(data = dfGiving, aes(x = Var1, y = 100*Freq)) +
        title = "Percent of Annual Predicted Income by Month for July 2019 - June 2020") +
   theme(axis.text.x = element_text(angle=45, hjust=1))
 ```
+
 This projection assumes that 1) giving follows patterns true between 2010 and 2018, that 2) the number of giving families is constant over the projection period and 3) the giving families giving practices are stable.
 
 Another potential use of the modeling result is to use the January through June income from the preceeding fiscal year to project the following fiscal year. A sum of the January through June portions gives:
