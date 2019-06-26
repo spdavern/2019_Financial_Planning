@@ -50,10 +50,16 @@ $ git clone https://github.com/spdavern/2019_Financial_Planning
 
 # R Notebooks
 
-| Notebook (.Rmd)           | Description of Work Covered                                                                                                                 |
-| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| README                    | This R Notebook that summarizes the contents of the project and that produces the github flavored MarkDown making GitHub easier to consume. |
-| Transfer of 2013 Analysis | Convertion of modeling done in 2013 into R. Uses the model: \(\textit{Monthly Giving} = a+b_{year}+c_{month}\)                              |
+| Notebook (.Rmd)              | Description of Work Covered                                                                                                                                                                                                              |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| README                       | This R Notebook that summarizes the contents of the project and that produces the github flavored MarkDown making GitHub easier to consume.                                                                                              |
+| Transfer of 2013 Analysis    | Convertion of modeling done in 2013 into R. Uses the model: \(\textit{Monthly Giving} = a+b_{year}+c_{month}\)                                                                                                                           |
+| 2018 Model Extensions        | Applies the 2013 model to giving data through part of 2018                                                                                                                                                                               |
+| Months Giving Per Week Model | Models monthly giving per week per giver data from 2010 to 2018 using the model: \[
+ln{\left[\frac{\textit{Monthly Giving}}
+{\textit{Number of Sundays in Month}*\textit{Giving Families}}\right]} 
+= a+b_{year}+c_{month} + \epsilon
+\] |
 
 Note that the corresponding notebook.nb.html is the html rendering of
 the .Rmd file and can be opened in a browser.

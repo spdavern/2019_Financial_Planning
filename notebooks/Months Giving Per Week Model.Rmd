@@ -1,0 +1,507 @@
+---
+title: "Monthly Giving Per Week Modeling"
+author: "Sean Davern"
+date: "June 26, 2019"
+output:
+  html_document:
+    df_print: paged
+    toc: true
+    toc_float: true
+  pdf_document: 
+    df_print: kable
+    toc: true
+  html_notebook: default
+---
+# Overview
+
+Work to model giving to Seed Church in 2015 noted that giving each month is a function of the number of Sundays that occur in the month on top of varying, somewhat predictably, from month to month. It is also a function of the number of giving families attending Seed Church.  This work aims at regressing linear a model of the measure that includes those factors to tools useful for forecasting.
+$$\frac{\textit{Monthly Giving}}{n_\textit{Sundays in Month} \cdot n_\textit{Giving Families}}
+= a+b_{year}+c_{month}$$
+
+# Load Data
+Loading cleaned and transformed (sanitized) giving data originally provided by John Earling:
+```{r}
+df <- readRDS("../data/Cleaned and Transformed Giving Data.rds")
+df
+```
+# Adding Columns to Accomodate Analysis
+I'll add a couple columns to enable accommodating for giving anomolies:
+```{r}
+suppressMessages(library("dplyr", quietly=TRUE, warn.conflicts = FALSE))
+df <- mutate(df, 
+             removed.amount = 0, 
+             original.total = total)
+```
+
+# Accommodating an Unusually Large Gift
+12/26/2016 had an unusual single gift skewing it and analyses. Other large gifts have been recieved over this period but this gift was at least 50% larger than all others. I'm removing the amount of the unusual gift from its month's total.
+```{r}
+df$removed.amount[as.Date(df$week.ending) == "2016-12-25"] <- 20000
+df$total <- df$original.total - df$removed.amount
+```
+
+# The Measure to be Modeled
+The following plot shows the trend of each month's giving per week per giving family.
+
+```{r}
+df$MonthsGivingPerWeek <- df$total / 
+                                df$SundaysInMonth / 
+                                df$monthly.giving.families
+```
+
+```{r echo=FALSE}
+library("magrittr")
+suppressMessages(library("ggplot2"))
+library("RColorBrewer")
+cbPalette <- brewer.pal(12,"Paired")  # Used http://colorbrewer2.org/
+names(cbPalette) <- levels(month.name)
+colScale <- scale_color_manual(name = "month", values = cbPalette)
+t.size <- 9
+#df$week.ending <- as.Date(df$week.ending, "%Y-%m-%d", tz="UTC")
+plot1 <- ggplot(df, aes(x = as.Date(week.ending), 
+                        y = MonthsGivingPerWeek, 
+                        color=month )) +
+  geom_point() +
+  colScale + labs(x = "Date", 
+                  y = "Giving Per Week Per Giving Family ($)",
+                  title = "Giving Data by Month") + 
+  scale_x_date(date_labels = "%Y", date_breaks = "1 year") + 
+  scale_y_continuous(breaks = seq(60, 300, by=20)) +
+  theme(text = element_text(size=t.size),
+        panel.grid.major = element_line(color = "azure2",
+                                        linetype = "dashed",
+                                        line), 
+        axis.text.x = element_text(angle=45, hjust=1))
+plot1
+```
+This chart seems to show increasing variation over time especially if the high November and December 2016 data is not anomolous.  Following [methods recommended by NIST](https://www.itl.nist.gov/div898/handbook/pmd/section6/pmd633.htm) the following plots allow assessing heteroscedasticity for potential measure transformations (square root, natural log, and inverse (1/x)):
+
+```{r}
+# Create columns of transformed responses:
+library("magrittr")
+df <- mutate(df, SqrtMonthsGivingPerWeek = sqrt(df$MonthsGivingPerWeek))
+df <- mutate(df, logMonthsGivingPerWeek = log(df$MonthsGivingPerWeek))
+df <- mutate(df, InvMonthgivingPerWeek = 1/df$MonthsGivingPerWeek)
+```
+
+```{r echo=FALSE}
+library("magrittr")
+suppressMessages(library("ggplot2"))
+library("RColorBrewer")
+suppressMessages(library("gridExtra", quietly = TRUE))
+cbPalette <- brewer.pal(12,"Paired")  # Used http://colorbrewer2.org/
+names(cbPalette) <- levels(month.name)
+colScale <- scale_color_manual(name = "month", values = cbPalette)
+t.size <- 9
+plotBase <- suppressMessages(plot1 + theme(legend.position="none") +
+  labs(y = "Untransformed", title = NULL) + 
+  scale_y_continuous(breaks = seq(60, 300, by=40)))
+plotSqrt <- ggplot(df, aes(x = as.Date(week.ending), 
+                           y = SqrtMonthsGivingPerWeek, 
+                           color=month )) +
+  geom_point() +
+  colScale + labs(x = "Date", 
+                  y = "Sqrt Transformed") + 
+  scale_x_date(date_labels = "%Y", date_breaks = "1 year") + 
+  scale_y_continuous(breaks = seq(8, 18, by=1)) +
+  theme(text = element_text(size=t.size),
+        panel.grid.major = element_line(color = "azure2",
+                                        linetype = "dashed",
+                                        line), 
+        axis.text.x = element_text(angle=45, hjust=1),
+        legend.position="none")
+plotLog <- ggplot(df, aes(x = as.Date(week.ending), 
+                          y = logMonthsGivingPerWeek, 
+                          color=month )) +
+  geom_point() +
+  colScale + labs(x = "Date", 
+                  y = "Log Transformed") + 
+  scale_x_date(date_labels = "%Y", date_breaks = "1 year") + 
+  scale_y_continuous(breaks = seq(4, 6, by=0.25)) +
+  theme(text = element_text(size=t.size),
+        panel.grid.major = element_line(color = "azure2",
+                                        linetype = "dashed",
+                                        line), 
+        axis.text.x = element_text(angle=45, hjust=1),
+        legend.position="none")
+plotInv <- ggplot(df, aes(x = as.Date(week.ending), 
+                          y = InvMonthgivingPerWeek, 
+                          color=month )) +
+  geom_point() +
+  colScale + labs(x = "Date", 
+                  y = "Inv Transformed") + 
+  scale_x_date(date_labels = "%Y", date_breaks = "1 year") + 
+  scale_y_continuous(breaks = seq(0.003, 0.016, by=0.002)) +
+  theme(text = element_text(size=t.size),
+        panel.grid.major = element_line(color = "azure2",
+                                        linetype = "dashed",
+                                        line), 
+        axis.text.x = element_text(angle=45, hjust=1),
+        legend.position="none")
+grid.arrange(plotBase, 
+             plotSqrt, 
+             plotLog, 
+             plotInv, 
+             ncol=2, nrow=2,
+             top = "Transformations of Monthly Giving Per Week Per Family")
+```
+None of the transformations are dramatically better heterscadicity.  Of particular question is whether the trend in the measure is mostly linear through the entire period or if it flattens and perhaps even begins to decrease.  Keep in mind, this isn't the total giving, that definitely decreases into 2018.  This is whether the average giving per week per family decreases.  Such a shift could be a signal of decreased faith in the church or a byproduct of the nature of the giving by the collection of families making up the congregation.  Anyway, the end of 2016 high values in all cases seem to be slightly anamolous even though I've alread removed the single large gift in December 2016.  Despite the similarities in variance consistency, I'm going to move forward with the log transformation because it seem slightly better than untransformed.
+
+# Modeling
+Regressing the R version (vs. the JMP approach) of this model:
+$$
+ln{\left[\frac{\textit{Monthly Giving}}
+{\textit{Number of Sundays in Month}*\textit{Giving Families}}\right]} 
+= a+b_{year}+c_{month} + \epsilon
+$$
+
+where a, $b_{year}$ and $c_{month}$ are regressed model coefficients and $\epsilon$ is error.
+
+```{r}
+mod <- lm( formula = logMonthsGivingPerWeek ~ year + month, data = df)
+# Calculate month total giving using regression results:
+df <- mutate(df, predicted.values = exp(predict(mod,df))  * 
+               SundaysInMonth *
+               monthly.giving.families) %>%
+  mutate(residual.values = total - predicted.values )
+```
+
+gives the following model fit assessment:  
+
+```{r echo=FALSE}
+library("gridExtra", quietly = TRUE)
+plot1 <- ggplot(mod, aes(sample = mod$residuals)) +
+  stat_qq() + 
+  stat_qq_line(linetype="dashed", color="blue") +
+  labs(x = "Theoretical Quantiles",
+       y = "Standardized Residuals",
+       title = "Normal Q-Q Plot") +
+  theme(text = element_text(size=t.size))
+plot2 <- ggplot(df, aes(x = mod$fitted.values, 
+                        y = df$logMonthsGivingPerWeek, color=month)) + 
+  geom_point() + geom_abline(intercept = 0, slope = 1, color="red") +
+  colScale + labs(x = "Predicted", 
+                  y = "Actual",
+                  title = "Actual by Predicted Plot") +
+  theme(text = element_text(size=t.size), 
+        axis.text.x = element_text(angle=45, hjust=1)) +
+  theme(legend.position="none")
+plot3 <- ggplot(df, aes(x = mod$fitted.values, y = mod$residuals, color = month)) +
+  geom_point() + geom_hline(yintercept = 0, linetype="dashed", 
+                            color = "blue") +
+  colScale + labs(x = "Predicted", y = "Residuals",
+                  title = "Residual by Predicted Plot") + 
+  theme(text = element_text(size=t.size), 
+        axis.text.x = element_text(angle=45, hjust=1)) +
+  theme(legend.position="none")
+plot4 <- ggplot(df, aes(x = as.Date(week.ending), 
+                         y = mod$residuals, 
+                         color = month)) + 
+  geom_point() + geom_hline(yintercept = 0, 
+                            linetype="dashed", 
+                            color = "blue") + 
+  colScale +
+  scale_x_date(date_labels = "%Y", date_breaks = "1 year") + 
+  labs(x = "Date", 
+       y = "Residuals",
+       title = "Residual by Date Plot") + 
+  theme(text = element_text(size=t.size),
+        legend.position="none", 
+        axis.text.x = element_text(angle=45, hjust=1))
+grid.arrange(plot2, plot3, plot4, plot1, ncol=2, nrow=2)
+anova(mod)
+summary(mod)
+```
+This fit looks reasonably good though the normal quantile plot shows slightly heavy distribution tails.  High a low months are not predicted as well.  The model clearly differentiates month giving as shown by the significance of the month coefficient terms (see both ANOVA table and coefficients table).
+
+# Model Predictions for Monthly Total Giving
+
+Model results can be used to back calculate the monthly giving totals to observe the fit in that context.
+
+```{r echo=FALSE}
+library("magrittr")
+suppressMessages(library("ggplot2"))
+library("RColorBrewer")
+cbPalette <- brewer.pal(12,"Paired")  # Used http://colorbrewer2.org/
+names(cbPalette) <- levels(month.name)
+colScale <- scale_color_manual(name = "month", values = cbPalette)
+t.size <- 9
+df$week.ending <- as.Date(df$week.ending, "%Y-%m-%d", tz="UTC")
+ggplot(df, aes(x = as.Date(week.ending), y = total, color=month )) +
+  geom_point() + geom_line(color='blue', 
+                           data = df, 
+                           aes(x=week.ending,y=predicted.values)) +
+  colScale + labs(x = "Date", 
+                  y = "Month's Giving ($)",
+                  title = "Monthly Giving Model & Data") + 
+  scale_x_date(date_labels = "%Y", date_breaks = "1 year") + 
+  scale_y_continuous(breaks = seq(10000, 45000, by=5000),
+                     labels = scales::comma) +
+  theme(text = element_text(size=t.size),
+        panel.grid.major = element_line(color = "azure2",
+                                        linetype = "dashed",
+                                        line), 
+        axis.text.x = element_text(angle=45, hjust=1))
+```
+
+\newpage
+# Model Fit Assessment
+Here are the fit assessment graphs with the fit results in the context of the monthly total giving.
+
+```{r echo=FALSE}
+library("gridExtra", quietly = TRUE)
+plot1 <- ggplot(mod, aes(sample = mod$residuals)) +
+  stat_qq() + 
+  stat_qq_line(linetype="dashed", color="blue") +
+  labs(x = "Theoretical Quantiles",
+       y = "Standardized Residuals",
+       title = "Normal Q-Q Plot") +
+  theme(text = element_text(size=t.size))
+plot2 <- ggplot(df, aes(x = predicted.values, 
+                        y = total, color=month)) + 
+  geom_point() + geom_abline(intercept = 0, slope = 1, color="red") +
+  colScale + labs(x = "Monthly Giving Predicted", 
+                  y = "Monthly Giving Actual",
+                  title = "Actual by Predicted Plot") +
+  theme(text = element_text(size=t.size), 
+        axis.text.x = element_text(angle=45, hjust=1)) +
+  theme(legend.position="none")
+plot3 <- ggplot(df, aes(x = predicted.values, y = residual.values, color = month)) +
+  geom_point() + geom_hline(yintercept = 0, linetype="dashed", 
+                            color = "blue") +
+  colScale + labs(x = "Monthly Giving Predicted", y = "Residuals",
+                  title = "Residual by Predicted Plot") + 
+  theme(text = element_text(size=t.size), 
+        axis.text.x = element_text(angle=45, hjust=1)) +
+  theme(legend.position="none")
+plot4 <- ggplot(df, aes(x = as.Date(week.ending), 
+                         y = residual.values, 
+                         color = month)) + 
+  geom_point() + geom_hline(yintercept = 0, 
+                            linetype="dashed", 
+                            color = "blue") + 
+  colScale +
+  scale_x_date(date_labels = "%Y", date_breaks = "1 year") + 
+  labs(x = "Date", 
+       y = "Residuals",
+       title = "Residual by Date Plot") + 
+  theme(text = element_text(size=t.size),
+        legend.position="none", 
+        axis.text.x = element_text(angle=45, hjust=1))
+grid.arrange(plot2, plot3, plot4, plot1, ncol=2, nrow=2)
+```
+The Residuals by Predicted Plot, in particular, shows the highest giving is over predicted.  This could possibly be caused by including a number of other larger donations that might have been one-time donations not representative of "regular" giving.  However, those obviously happen occassionally so including them causes the model to predict presuming they will happen.
+
+The overall model root mean square error (RSME) in the modeled monthly giving is:
+```{r echo=FALSE}
+noquote(paste("$",format(sqrt(mean(df$residual.values^2)),big.mark = ",")))
+```
+This value is helpful in establishing an income variability fund to offset giving variation.  The RSME is a good, non-biased estimator of the standard deviation ($\sigma$) of the distribution of residuals.  The normal quantile plot above shows the majority of the residual distribution are normally distributed.  While the tails (residuals at the high and low end of giving) are more common than a normal distribution, the high giving is more common than the lows.
+
+\newpage
+# Modeling Monthly Variation
+
+An useful aspect of the model chosen is that it can be rearranged in a useful way for forecasting.  The following discussion shows that rearrangement.  Starting with the model for the natural log transformed giving per Sunday per month per giving family:
+
+$$
+\begin{aligned}
+\begin{split}
+ln{\left[\frac{\textit{Monthly Giving}}{n_\textit{Sundays in Month} \cdot n_\textit{Giving Families}}\right]}
+&= a+b_{year}+c_{month} 
+\\
+\\
+\frac{\textit{Monthly Giving}}{n_\textit{Sundays in Month}\cdot n_\textit{Giving Families}} 
+&= e^{(a+b_{year}+c_{month})}
+\end{split}
+\end{aligned}
+$$
+Shifting the $b_{year}$ and $c_{month}$ coefficients as previously discussed in the "Transfer of 2013 Analysis" notebook gives:
+$$
+\begin{aligned}
+\begin{split}
+\frac{\textit{Monthly Giving}}{n_\textit{Sundays in Month}*n_\textit{Giving Families}} 
+&= e^{
+\left(
+\big[a+\overline{b_{year}} + \overline{c_{month}}\big]+
+(b_{year}-\overline{b_{year}})+
+(c_{month}-\overline{c_{month}})
+\right)}
+\\
+&= e^{
+\left(
+\big[a+\overline{b_{year}}+\overline{c_{month}}\big]+
+b^\prime_{year} + c^\prime_{month}
+\right)}
+\\
+&= e^{\left(a+\overline{b_{year}}+\overline{c_{month}}\right)} \cdot
+e^{(b^\prime_{year})} \cdot e^{(c^\prime_{month})}
+\end{split}
+\end{aligned}
+$$
+The $e^{\left(a+\overline{b_{year}}+\overline{c_{month}}\right)} \cdot
+e^{(b^\prime_{year})}$ collection of terms is the average giving per Sunday per month per family in any particular year of interest.  When $b^\prime_{year}=0$ and $c^\prime_{month}=0$ the $e^0$ terms are 1 and the model returns that  __average__ month.  The $e^{c^\prime_{month}}$ terms are multipliers that provide a specific month's estimate for a given (or average) year.  These are the values of the $e^{c^\prime_{month}}$ terms:
+```{r}
+mon.coef <- c(0, mod$coefficients[10:20])
+names(mon.coef) <- month.name
+mon.coef <- exp(mon.coef - mean(mon.coef))
+mon.coef
+```
+Notice the average of the monthly coeffiecients is very close to 1:
+```{r}
+mean(mon.coef)
+```
+I'll reorder the vector of these coefficients to concide with the order of the fiscal year rather than the calendar year.  The values are not changed just the order.
+```{r}
+monthsInFYOrder <- c(month.name, month.name)[7:18]
+mon.coef <- mon.coef[monthsInFYOrder]
+mon.coef
+```
+
+The $e^{\left(a+\overline{b_{year}}+\overline{c_{month}}\right)} \cdot
+e^{(b^\prime_{year})}$ quantity can also be determined from annual data:  
+$$
+e^{\left(a+\overline{b_{year}}+\overline{c_{month}}\right)} \cdot
+e^{(b^\prime_{year})} = \frac{Giving_{year}}{n_{\textit{Sundays in Yr}}
+\cdot \overline{n}_f}
+$$
+Where $\overline{n}_f$ is the average number of families giving over the year.   
+Shortening the model expression with $n_\textit{Sundays in Month}=n_S$ and $n_\textit{Giving Families}=n_F$, both monthly values, and moving them over to the right we get:  
+
+$$
+\textit{Monthly Giving} =
+n_S*n_F  \cdot e^{\left(a+\overline{b_{year}}+\overline{c_{month}}\right)}
+\cdot e^{(b^\prime_{year})} \cdot e^{c^\prime_{month}}
+$$
+Summing both sides over some range of months:
+$$
+\begin{aligned}
+\begin{split}
+\sum_{Months}\textit{Monthly Giving} = Giving_{Total} &=
+\sum_{Months}{ \left[
+n_S*n_F  \cdot e^{\left(a+\overline{b_{year}}+\overline{c_{month}}\right)}
+\cdot e^{(b^\prime_{year})} \cdot e^{c^\prime_{month}}
+\right]}
+\\
+&= e^{\left(a+\overline{b_{year}}+\overline{c_{month}}\right)}
+\cdot e^{(b^\prime_{year})} \cdot \sum_{Months}{ \left[
+n_S*n_F \cdot e^{c^\prime_{month}}
+\right]}
+\end{split}
+\end{aligned}
+$$
+substituting for the $e^{\left(a+\overline{b_{year}}+\overline{c_{month}}\right)}
+\cdot e^{(b^\prime_{year})}$ terms gives:
+$$
+\begin{aligned}
+\begin{split}
+Giving_{Total} &= 
+\frac{Giving_{year}}{n_{\textit{Sundays in Yr}}
+\cdot \overline{n}_f} 
+\cdot \sum_{Months}{ \left[
+n_S*n_F \cdot e^{c^\prime_{month}} \right]}
+\\
+&=
+\frac{Giving_{year}}{\overline{n}_f} 
+\cdot \sum_{Months}{ \left[ \left(
+\frac{n_S}{n_{\textit{Sundays in Yr}}} \right)
+\cdot e^{c^\prime_{month}} *n_F \right]}
+\end{split}
+\end{aligned}
+$$
+Then, if $n_F$, the number of giving families in each month, is taken to be a constant average number, $\overline{n}_f$ that term can be pulled out of the sum and cancels.
+$$
+\begin{aligned}
+\begin{split}
+Giving_{Total} &= 
+Giving_{year} 
+\cdot \sum_{Months}{ \left[ \left(
+\frac{n_S}{n_{\textit{Sundays in Yr}}} \right)
+\cdot e^{c^\prime_{month}} \right]}
+\end{split}
+\end{aligned}
+$$
+It is this collection of terms inside the sum that provides the number-of-Sundays-in-each-month correction to the $e^{c^\prime_{month}}$ coefficients regressed in the model.  
+The following function calculates the vector of $n_S/n_{\textit{Sundays in Yr}}$ and shows the result for 2019:
+
+```{r}
+Sunday.Corrections <- function(year) {
+# This function get a list of the Sundays in the fiscal year from July 1, year to June 30, year+1
+  getSundaysInFY <- function(yr) {
+    startDate <- paste0(yr,"-07-01")
+    endDate <- paste0(yr+1,"-06-30")
+    dates <- seq(as.Date(startDate),as.Date(endDate), by = "day")
+    dates[weekdays(dates) == "Sunday"]
+  }
+  SundaysInYr <- getSundaysInFY(year)  # List of dates of Sundays in the year
+  numSundaysInFY <- length(SundaysInYr) # Number of Sundays in the year: 52 or 53
+  x <- strftime(SundaysInYr,"%m")  # Month listed once for each Sunday it contains
+  numSundaysInMonths <- table(factor(x,unique(x), ordered = TRUE))  # Sundays in each month.
+  names(numSundaysInMonths) <- c(month.name,month.name)[7:18]  # Convert names to month Names
+  Corrections <- numSundaysInMonths / numSundaysInFY
+  Corrections
+}
+Sunday.Corrections(2019)
+```
+If each month had $52/12 = 4\frac{1}{3}$ Sundays and there were 52 Sundays in the year, this vector would be all 0.083333.  Instead both the monthly and annual number of Sundays vary leading to the modeled income variation.  
+
+# Making Projections
+
+We can now calculate the vector of $(n_S/n_{\textit{Sundays in Yr}}) \cdot e^{c^\prime_{month}}$ products for the fiscal year beginning in July, 2019:
+
+```{r}
+Giving.Fractions <- Sunday.Corrections(2019)*mon.coef
+Giving.Fractions
+```
+Notice this vector sums to nearly 1, but given the inputs (model regressions and a fiscal year's distribution of Sundays) it is not exactly 1.
+```{r}
+sum(Giving.Fractions)
+```
+To keep the months so they sum exactly to the total we can normalize them:
+```{r}
+Giving.Fractions <- Giving.Fractions / sum(Giving.Fractions)
+Giving.Fractions
+cat("Sum = ", sum(Giving.Fractions))
+```
+
+Finally, a plot showing the relative magnitudes of the predicted monthly giving for the fiscal year beginning in July, 2019.
+
+```{r echo=FALSE}
+library("ggplot2")
+dfGiving <- as.data.frame(Giving.Fractions)
+ggplot(data = dfGiving, aes(x = Var1, y = 100*Freq)) +
+  geom_col(fill="steelblue") +
+  scale_y_continuous() +
+  scale_x_discrete() +
+  geom_text(data = dfGiving, 
+            aes(x=Var1, y=100*Freq, label=round(100*Freq, 3)), 
+            vjust=-0.25) +
+  labs(x = "Month",
+       y = "Portion of Annual Incoming (%)",
+       title = "Percent of Annual Predicted Income by Month for July 2019 - June 2020") +
+  theme(axis.text.x = element_text(angle=45, hjust=1))
+```
+This projection assumes that 1) giving follows patterns true between 2010 and 2018, that 2) the number of giving families is constant over the projection period and 3) the giving families giving practices are stable.
+
+Another potential use of the modeling result is to use the January through June income from the preceeding fiscal year to project the following fiscal year. A sum of the January through June portions gives:
+```{r}
+previous.year <- Sunday.Corrections(2018)*mon.coef
+previous.year <- previous.year / sum(previous.year)
+previous.year[7:12]
+cat("Sum = ", sum(previous.year[7:12]))
+```
+So, an estimate of FY2019 giving is:
+$$
+\textit{FY2019 Giving}= \frac {
+\sum_{Jan-Jun}{(\textit{2019 Giving})} 
+}{0.46}\cdot 
+\frac{\overline{n}_\textit{Giving Families in FY2019}}{\overline{n}_\textit{Giving Families in Jan-Jun 2019}}
+$$
+where $\overline{n}\text{'s}$ are the average number for the period indicated by subscripts.
+
+Again, this assumes giving follows historic patterns and giving per family is the same as in Jan-Jun 2019.
+
+Note: this prediction would be impacted by giving anomolies that impact the $\textit{2019 Giving}$ quantity like a significant amount of missing checks if they didn't make it in my the end of June.
+
+# Modeling Criticism
+
+One of the issues this modeling approach has is that regression assumes that factors are not correlated.  For example, giving one month does not affect giving the next month.  This is almost certainly not perfectly true.  For example, the model shows a repeated December to January drop in giving.  It could be that givers sometimes choose to move up a gift they planned to make in January to December for tax benefits.  Thus, it might be common that high giving one month could lead to lower giving the next month. This leads to a statistical correlation between the year term estimates. Separate from those examples, a regular giver's giving one month is highly likely to predict their giving the next month, similarly for the collection of regular givers'.  On the one hand, that predictability is what the model is attempting to capture.  On the other hand, it also provides the correlation between factors.  For example, a regular giver's donation that occurs bi-weekly could land within consecutive months based on paydays.  Regular givers that are paid and donate monthly are less likely to have the same "correlation".  For this reason, regression is perhaps not as technically appropriate as time series analysis.  Perhaps this just adds to George Box's point that all models are wrong, some are useful.
