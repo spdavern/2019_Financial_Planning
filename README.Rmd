@@ -3,10 +3,10 @@ title: "README for 2019 Financial Planning"
 author: "Sean Davern"
 date: "6/12/2019"
 output:
+  html_document: default
+  html_notebook: default
   md_document:
     variant: gfm  # This enables knitting a Github-flavored md file.
-  html_notebook: default
-  html_document: default
 ---
 
 # Overview
