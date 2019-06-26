@@ -50,6 +50,11 @@ $ git clone https://github.com/spdavern/2019_Financial_Planning
 
 # R Notebooks
 
+[Link to this README
+file](https://github.com/spdavern/2019_Financial_Planning/blob/master/README.html)
+which renders the equations in the table below
+properly.
+
 | Notebook (.Rmd)              | Description of Work Covered                                                                                                                                                                                                              |
 | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | README                       | This R Notebook that summarizes the contents of the project and that produces the github flavored MarkDown making GitHub easier to consume.                                                                                              |
